@@ -7,11 +7,14 @@
   <body>
     
         <form>
-          I am a <input id="profession" type="text"><br><br>
-          in <input id="userAddress" type="text" placeholder="Street/Bldg No. , City"><br><br>
-          Name <input id="username" type="text" placeholder="First Name">
-          E-mail <input type="email" name="emailaddress" placeholder="email@address.com"><br><br>
-          <button type="submit" value="Submit" id="go">Go</button>
+          I am a <input id="profession1" type="text" name="prof1"> who wants to meet a <input id="profession2" type="text" name="prof2"><br><br>
+
+          in <input id="userAddress" type="text" name="place" placeholder="Street/Bldg No. , City"><br><br>
+
+          Name <input id="username" type="text" name="firstname" placeholder="First Name">
+          E-mail <input id="email" type="email" name="emailaddress" placeholder="email@address.com"><br><br>
+
+          <button id="go" type="submit" value="Submit">Go</button>
         </form>
         <!-- JQuery -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -30,13 +33,23 @@
           
           var database = firebase.database();
           var userName = "";
-          var userProf = "";
+          var userEmail = "";
+          var user1Prof = "";
+          var user2Prof = "";
           var userAddress;
+          var geoAddress;
           var locationId;
           var userLatitude;
           var userLongitude;
           var appId = "ZfRJXkOh1WKLZLV14MDE";
           var appCode = "9NvfebHqxDHv33VtQXDsCg";
+
+          function setUserInfo(){
+            userName = $("#username").val().trim();
+            userEmail = $("#email").val().trim();
+            user1Prof = $("#profession1").val().trim();
+            user2Prof = $("#profession2").val().trim();
+          }
           
           function getUserGeoAddress (latitude, longitude) {
           $.ajax({
@@ -61,7 +74,6 @@
           });
           };
           
-          
           if ("geolocation" in navigator) {
           
           // check if geolocation is supported/enabled on current browser
@@ -77,10 +89,9 @@
              getUserGeoAddress(userLatitude, userLongitude);
           
              $("#go").on("click",function(){
+
              	event.preventDefault();
-             	userName = $("#username").val().trim();
-            	userProf = $("#profession").val().trim();
-          
+             	setUserInfo();
              	pushInfoInFireBase();
              });
            },
@@ -94,7 +105,9 @@
           } else {
             // geolocation is not supported
             // get your location some other way
-            console.log('geolocation is not enabled on this browser')
+            console.log('geolocation is not enabled on this browser');
+            alert("Please enter your address to continue.");
+            getAddressByTextInput();
           }
           
           // stores all users' info in firebase
@@ -103,11 +116,10 @@
           
             event.preventDefault(); 
           
-            //text that user enters in "enter your location here"
+            //user info
             userAddress = $("#userAddress").val().trim();
             console.log(userAddress);
-            userName = $("#username").val().trim();
-            userProf = $("#profession").val().trim();
+            setUserInfo();
           
             //autocomplete text key (used for getting location id of user address)
             var locIdURL = "http://autocomplete.geocoder.api.here.com/6.2/suggest.json?app_id="+appId+"&app_code="+appCode+"&query="+userAddress+"&beginHighlight=<b>&endHighlight=</b>";
@@ -129,12 +141,12 @@
           
           function getMatchingProfessions(profession){
           	//this is useful code for logging all users with same profession.
-            database.ref().orderByChild("profession").equalTo(userProf).on("child_added", function(snapshot) {
+            database.ref().orderByChild("profession1").equalTo(user1Prof).on("child_added", function(snapshot) {
               	// snapshot.key gives the unique alphanumerical key of user
               	//so commented that out
               	// console.log(snapshot.key);
               	console.log(snapshot.val().name);
-                console.log(snapshot.val().profession);
+                console.log(snapshot.val().profession1);
           
               }, function(errorObject) {
                 console.log("Errors handled: " + errorObject.code);
@@ -163,12 +175,14 @@
            function pushInfoInFireBase(){
             database.ref().push( {
                   name: userName,
-                  profession: userProf,
+                  email: userEmail,
+                  profession1: user1Prof,
+                  profession2: user2Prof,
                   userLat: userLatitude,
                   userLong: userLongitude,
                   dateAdded: firebase.database.ServerValue.TIMESTAMP
                 });
-                getMatchingProfessions(userProf); 
+                getMatchingProfessions(user1Prof); 
            }
         </script>
       </body>
