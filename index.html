@@ -50,7 +50,7 @@
             user1Prof = $("#profession1").val().trim();
             user2Prof = $("#profession2").val().trim();
           }
-          
+
           function getUserGeoAddress (latitude, longitude) {
           $.ajax({
            url: 'https://reverse.geocoder.api.here.com/6.2/reversegeocode.json?prox=' + userLatitude + ',' + userLongitude + '',
@@ -107,7 +107,7 @@
             // get your location some other way
             console.log('geolocation is not enabled on this browser');
             alert("Please enter your address to continue.");
-            getAddressByTextInput();
+            //getAddressByTextInput();
           }
           
           // stores all users' info in firebase
