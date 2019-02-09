@@ -3,183 +3,235 @@
   <head>
     <meta charset="utf-8">
     <title>Get Geo or Text address of user</title>
+    <style type="text/css">
+      .dropdown {
+      display:inline-block;
+      }
+      #userAddress{
+      width:200px;
+      }
+    </style>
   </head>
   <body>
-    
-        <form>
-          I am a <input id="profession1" type="text" name="prof1"> who wants to meet a <input id="profession2" type="text" name="prof2"><br><br>
-
-          in <input id="userAddress" type="text" name="place" placeholder="Street/Bldg No. , City"><br><br>
-
-          Name <input id="username" type="text" name="firstname" placeholder="First Name">
-          E-mail <input id="email" type="email" name="emailaddress" placeholder="email@address.com"><br><br>
-
-          <button id="go" type="submit" value="Submit">Go</button>
-        </form>
-        <!-- JQuery -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-        <script src="https://www.gstatic.com/firebasejs/5.8.2/firebase.js"></script>
-        <script>
-          // Initialize Firebase
-          var config = {
-            apiKey: "AIzaSyBx9uPZZTyw4AyEWwBTwB6Cl0o3kyPSKz8",
-            authDomain: "roulette-project.firebaseapp.com",
-            databaseURL: "https://roulette-project.firebaseio.com",
-            projectId: "roulette-project",
-            storageBucket: "roulette-project.appspot.com",
-            messagingSenderId: "52492766979"
-          };
-          firebase.initializeApp(config);
-          
-          var database = firebase.database();
-          var userName = "";
-          var userEmail = "";
-          var user1Prof = "";
-          var user2Prof = "";
-          var userAddress;
-          var geoAddress;
-          var locationId;
-          var userLatitude;
-          var userLongitude;
-          var appId = "ZfRJXkOh1WKLZLV14MDE";
-          var appCode = "9NvfebHqxDHv33VtQXDsCg";
-          function setUserInfo(){
-            userName = $("#username").val().trim();
-            userEmail = $("#email").val().trim();
-            user1Prof = $("#profession1").val().trim();
-            user2Prof = $("#profession2").val().trim();
-          }
-          function getUserGeoAddress (latitude, longitude) {
+    <p>
+    <div class="dropdown" id="user1">
+      <span>I'm </span>
+      <select id="profession1"></select>
+    </div>
+    <span>who wants to meetup with </span>
+    <div class="dropdown" id="user2">
+      <select id="profession2"></select>
+    </div>
+    </p>
+    <form>
+      in <input id="userAddress" type="text" name="place" placeholder="Street/Bldg No. , City"><br><br>
+      Name <input id="username" type="text" name="firstname" placeholder="First Name">
+      E-mail <input id="email" type="email" name="emailaddress" placeholder="email@address.com"><br><br>
+      <button id="go" type="submit" value="Submit">Go</button>
+    </form>
+    <!-- JQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.8.2/firebase.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyBx9uPZZTyw4AyEWwBTwB6Cl0o3kyPSKz8",
+        authDomain: "roulette-project.firebaseapp.com",
+        databaseURL: "https://roulette-project.firebaseio.com",
+        projectId: "roulette-project",
+        storageBucket: "roulette-project.appspot.com",
+        messagingSenderId: "52492766979"
+      };
+      firebase.initializeApp(config);
+      
+      var database = firebase.database();
+      var userName = "";
+      var userEmail = "";
+      var user1Prof = "";
+      var user2Prof = "";
+      var userAddress;
+      var geoAddress;
+      var locationId;
+      var userLatitude;
+      var userLongitude;
+      var appId = "ZfRJXkOh1WKLZLV14MDE";
+      var appCode = "9NvfebHqxDHv33VtQXDsCg";
+      var professions = ['Application Developer','Applications Engineer','Associate Developer','Computer Programmer','Developer','Front End Developer','Java Developer','Junior Programmer','Junior Software Engineer','Junior Web Developer','Programmer Analyst','Senior Applications Engineer','Senior Programmer','Senior Software Engineer','Senior System Architect','Senior System Designer','Senior Systems Software Engineer','Senior Web Administrator','Senior Web Developer','Software Architect','Software Developer','Software Engineer','Software Quality Assurance Analyst','Student','System Architect','Systems Software Engineer','Web Administrator','Webmaster']
+      
+      function createDropdownContent(){
+        
+        //User dropdowns + professions
+      
+        for(var i=0; i< professions.length;i++){
+            $('<option/>', {value: professions[i],html: professions[i]}).appendTo('#user1 select'); 
+            $('<option/>', {value: professions[i],html: professions[i]}).appendTo('#user2 select'); 
+        }
+      
+        $('#user1').change(function () {
+             user1Prof= $("#user1 option:selected").text();
+            console.log('Prof1:', user1Prof)
+      
+        });
+      
+        $('#user2').change(function () {
+             user2Prof= $("#user2 option:selected").text();
+            console.log('Prof2:', user2Prof);
+        });
+      }
+      createDropdownContent();
+      
+      function setUserInfo(){
+        userName = $("#username").val().trim();
+        userEmail = $("#email").val().trim();
+        user1Prof = $("#profession1").val().trim();
+        user2Prof = $("#profession2").val().trim();
+      }
+      function getUserGeoAddress (latitude, longitude) {
+      $.ajax({
+       url: 'https://reverse.geocoder.api.here.com/6.2/reversegeocode.json?prox=' + userLatitude + ',' + userLongitude + '',
+       type: 'GET',
+       dataType: 'jsonp',
+       jsonp: 'jsoncallback',
+       data: {
+         mode: 'retrieveAddresses',
+         maxresults: '1',
+         gen: '9',
+         app_id: 'h8bxzedipYeOeMK6Yyi0',
+         app_code: 'Zte-5udXFmEcJ8-43bG6_g'
+       },
+       success: function (data) {
+        geoAddress = data.Response.View[0].Result[0].Location.Address.City +"," + " " + data.Response.View[0].Result[0].Location.Address.State + " " + data.Response.View[0].Result[0].Location.Address.PostalCode;
+        $('#userAddress').val(geoAddress);
+        userAddress = geoAddress;
+        console.log(userAddress);
+      }
+      });
+      };
+      
+      if ("geolocation" in navigator) {
+      
+      // check if geolocation is supported/enabled on current browser
+      navigator.geolocation.getCurrentPosition(
+      
+       function success(position) {
+         // for when getting location is a success
+      
+         console.log('latitude', position.coords.latitude,'longitude', position.coords.longitude);
+         userLatitude = position.coords.latitude;
+         userLongitude = position.coords.longitude;
+         
+         getUserGeoAddress(userLatitude, userLongitude);
+      
+         $("#go").on("click",function(){
+          event.preventDefault();
+          setUserInfo();
+          pushInfoInFireBase();
+         });
+       },
+       function error(error_message) {
+        // for when getting location results in an error
+        console.error('An error has occured while retrieving location', error_message);
+        alert("Please enter your address to continue.");
+        getAddressByTextInput();
+      
+      });
+      } else {
+        // geolocation is not supported
+        // get your location some other way
+        console.log('geolocation is not enabled on this browser');
+        alert("Please enter your address to continue.");
+        //getAddressByTextInput();
+      }
+      
+      // stores all users' info in firebase
+      function getAddressByTextInput(){
+      $("#go").on("click",function(){
+      
+        event.preventDefault(); 
+      
+        //user info
+        userAddress = $("#userAddress").val().trim();
+        console.log(userAddress);
+        setUserInfo();
+      
+        //autocomplete text key (used for getting location id of user address)
+        var locIdURL = "http://autocomplete.geocoder.api.here.com/6.2/suggest.json?app_id="+appId+"&app_code="+appCode+"&query="+userAddress+"&beginHighlight=<b>&endHighlight=</b>";
+      
+        $.ajax({
+          url: locIdURL,
+          type: "GET"
+        }).then(function(data){
+          // console.log(data);
+      
+            //getting the location id for the user address
+            //chose [0] index as it shows the closest match to the user input
+            locationId = data.suggestions[0].locationId;
+            // console.log(locationId);
+            getUserCoords();   
+          });  
+      });
+      }
+      
+      function getUserCoords(){
+      
+          //geocoder key (used for getting lat and long from user's location id)
+          var locIdCoordURL = "http://geocoder.api.here.com/6.2/geocode.json?locationid="+locationId+"&jsonattributes=1&gen=9&app_id="+appId+"&app_code="+appCode;
+      
           $.ajax({
-           url: 'https://reverse.geocoder.api.here.com/6.2/reversegeocode.json?prox=' + userLatitude + ',' + userLongitude + '',
-           type: 'GET',
-           dataType: 'jsonp',
-           jsonp: 'jsoncallback',
-           data: {
-             mode: 'retrieveAddresses',
-             maxresults: '1',
-             gen: '9',
-             app_id: 'h8bxzedipYeOeMK6Yyi0',
-             app_code: 'Zte-5udXFmEcJ8-43bG6_g'
-           },
-           success: function (data) {
-            geoAddress = data.Response.View[0].Result[0].Location.Address.City +"," + " " + data.Response.View[0].Result[0].Location.Address.State + " " + data.Response.View[0].Result[0].Location.Address.PostalCode;
-            $('#userAddress').val(geoAddress);
-            userAddress = geoAddress;
-            console.log(userAddress);
-          }
+            url: locIdCoordURL,
+            type: "GET"
+          }).then(function(data){
+            // console.log(data);
+            userLatitude = data.response.view[0].result[0].location.displayPosition.latitude;
+            userLongitude = data.response.view[0].result[0].location.displayPosition.longitude;
+            console.log(userLatitude);
+            console.log(userLongitude);
+      
+            pushInfoInFireBase();
           });
-          };
-          
-          if ("geolocation" in navigator) {
-          
-          // check if geolocation is supported/enabled on current browser
-          navigator.geolocation.getCurrentPosition(
-          
-           function success(position) {
-             // for when getting location is a success
-          
-             console.log('latitude', position.coords.latitude,'longitude', position.coords.longitude);
-             userLatitude = position.coords.latitude;
-             userLongitude = position.coords.longitude;
-             
-             getUserGeoAddress(userLatitude, userLongitude);
-          
-             $("#go").on("click",function(){
-              event.preventDefault();
-              setUserInfo();
-              pushInfoInFireBase();
-             });
-           },
-           function error(error_message) {
-            // for when getting location results in an error
-            console.error('An error has occured while retrieving location', error_message);
-            alert("Please enter your address to continue.");
-            getAddressByTextInput();
-          
+        }    
+      
+      function getMatchingProfessions(myProf, seekingProf, myLat, myLong){
+      
+          console.log("searching for "+ seekingProf);
+          var matchedPeople = [] ;
+      
+          //this is useful code for logging all users with same profession.
+          database.ref().orderByChild("profession1").equalTo(seekingProf).on("child_added", function(snapshot) {
+            // snapshot.key gives the unique alphanumerical key of user
+            //so commented that out
+            // console.log(snapshot.key);
+      
+            if(snapshot.val().profession2 == myProf) {
+              // && isCloseBy(snapshot.val().userLat,snapshot.val().userLong, myLat, myLong)
+      
+              // console.log(snapshot.val());
+              console.log(snapshot.val().name);
+              console.log(snapshot.val().profession1);
+              console.log(snapshot.val().profession2);
+              matchedPeople.push(snapshot.val().name);
+      
+          }
+          }, function(errorObject) {
+            console.log("Errors handled: " + errorObject.code);
           });
-          } else {
-            // geolocation is not supported
-            // get your location some other way
-            console.log('geolocation is not enabled on this browser');
-            alert("Please enter your address to continue.");
-            //getAddressByTextInput();
-          }
-          
-          // stores all users' info in firebase
-          function getAddressByTextInput(){
-          $("#go").on("click",function(){
-          
-            event.preventDefault(); 
-          
-            //user info
-            userAddress = $("#userAddress").val().trim();
-            console.log(userAddress);
-            setUserInfo();
-          
-            //autocomplete text key (used for getting location id of user address)
-            var locIdURL = "http://autocomplete.geocoder.api.here.com/6.2/suggest.json?app_id="+appId+"&app_code="+appCode+"&query="+userAddress+"&beginHighlight=<b>&endHighlight=</b>";
-          
-            $.ajax({
-              url: locIdURL,
-              type: "GET"
-            }).then(function(data){
-              // console.log(data);
-          
-                //getting the location id for the user address
-                //chose [0] index as it shows the closest match to the user input
-                locationId = data.suggestions[0].locationId;
-                // console.log(locationId);
-                getUserCoords();   
-              });  
-          });
-          }
-
-          function getUserCoords(){
-          
-              //geocoder key (used for getting lat and long from user's location id)
-              var locIdCoordURL = "http://geocoder.api.here.com/6.2/geocode.json?locationid="+locationId+"&jsonattributes=1&gen=9&app_id="+appId+"&app_code="+appCode;
-          
-              $.ajax({
-                url: locIdCoordURL,
-                type: "GET"
-              }).then(function(data){
-                // console.log(data);
-                userLatitude = data.response.view[0].result[0].location.displayPosition.latitude;
-                userLongitude = data.response.view[0].result[0].location.displayPosition.longitude;
-                console.log(userLatitude);
-                console.log(userLongitude);
-          
-                pushInfoInFireBase();
-              });
-            }    
-          
-          function getMatchingProfessions(profession){
-            //this is useful code for logging all users with same profession.
-            database.ref().orderByChild("profession1").equalTo(user1Prof).on("child_added", function(snapshot) {
-                // snapshot.key gives the unique alphanumerical key of user
-                //so commented that out
-                // console.log(snapshot.key);
-                console.log(snapshot.val().name);
-                console.log(snapshot.val().profession1);
-          
-              }, function(errorObject) {
-                console.log("Errors handled: " + errorObject.code);
-              });
-          }
-          
-           function pushInfoInFireBase(){
-            database.ref().push( {
-                  name: userName,
-                  email: userEmail,
-                  profession1: user1Prof,
-                  profession2: user2Prof,
-                  userLat: userLatitude,
-                  userLong: userLongitude,
-                  dateAdded: firebase.database.ServerValue.TIMESTAMP
-                });
-                getMatchingProfessions(user1Prof); 
-           }
-        </script>
-      </body>
-    </html>
+      
+            console.log(matchedPeople.length + " people matched");
+            console.log("Matched People are " + matchedPeople);
+      }
+      
+       function pushInfoInFireBase(){
+        database.ref().push( {
+              name: userName,
+              email: userEmail,
+              profession1: user1Prof,
+              profession2: user2Prof,
+              userLat: userLatitude,
+              userLong: userLongitude,
+              dateAdded: firebase.database.ServerValue.TIMESTAMP
+            });
+            getMatchingProfessions(user1Prof,user2Prof, userLatitude, userLongitude); 
+       }
+    </script>
+  </body>
+</html>
