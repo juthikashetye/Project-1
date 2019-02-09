@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-  	<meta charset="utf-8">
+    <meta charset="utf-8">
     <title>Get Geo or Text address of user</title>
   </head>
   <body>
@@ -43,14 +43,12 @@
           var userLongitude;
           var appId = "ZfRJXkOh1WKLZLV14MDE";
           var appCode = "9NvfebHqxDHv33VtQXDsCg";
-
           function setUserInfo(){
             userName = $("#username").val().trim();
             userEmail = $("#email").val().trim();
             user1Prof = $("#profession1").val().trim();
             user2Prof = $("#profession2").val().trim();
           }
-
           function getUserGeoAddress (latitude, longitude) {
           $.ajax({
            url: 'https://reverse.geocoder.api.here.com/6.2/reversegeocode.json?prox=' + userLatitude + ',' + userLongitude + '',
@@ -66,7 +64,6 @@
            },
            success: function (data) {
             geoAddress = data.Response.View[0].Result[0].Location.Address.City +"," + " " + data.Response.View[0].Result[0].Location.Address.State + " " + data.Response.View[0].Result[0].Location.Address.PostalCode;
-            console.log(geoAddress);
             $('#userAddress').val(geoAddress);
             userAddress = geoAddress;
             console.log(userAddress);
@@ -89,10 +86,9 @@
              getUserGeoAddress(userLatitude, userLongitude);
           
              $("#go").on("click",function(){
-
-             	event.preventDefault();
-             	setUserInfo();
-             	pushInfoInFireBase();
+              event.preventDefault();
+              setUserInfo();
+              pushInfoInFireBase();
              });
            },
            function error(error_message) {
@@ -128,31 +124,17 @@
               url: locIdURL,
               type: "GET"
             }).then(function(data){
-              console.log(data);
+              // console.log(data);
           
                 //getting the location id for the user address
                 //chose [0] index as it shows the closest match to the user input
                 locationId = data.suggestions[0].locationId;
-                console.log(locationId);
+                // console.log(locationId);
                 getUserCoords();   
               });  
           });
           }
-          
-          function getMatchingProfessions(profession){
-          	//this is useful code for logging all users with same profession.
-            database.ref().orderByChild("profession1").equalTo(user1Prof).on("child_added", function(snapshot) {
-              	// snapshot.key gives the unique alphanumerical key of user
-              	//so commented that out
-              	// console.log(snapshot.key);
-              	console.log(snapshot.val().name);
-                console.log(snapshot.val().profession1);
-          
-              }, function(errorObject) {
-                console.log("Errors handled: " + errorObject.code);
-              });
-          }
-          
+
           function getUserCoords(){
           
               //geocoder key (used for getting lat and long from user's location id)
@@ -162,7 +144,7 @@
                 url: locIdCoordURL,
                 type: "GET"
               }).then(function(data){
-                console.log(data);
+                // console.log(data);
                 userLatitude = data.response.view[0].result[0].location.displayPosition.latitude;
                 userLongitude = data.response.view[0].result[0].location.displayPosition.longitude;
                 console.log(userLatitude);
@@ -171,6 +153,20 @@
                 pushInfoInFireBase();
               });
             }    
+          
+          function getMatchingProfessions(profession){
+            //this is useful code for logging all users with same profession.
+            database.ref().orderByChild("profession1").equalTo(user1Prof).on("child_added", function(snapshot) {
+                // snapshot.key gives the unique alphanumerical key of user
+                //so commented that out
+                // console.log(snapshot.key);
+                console.log(snapshot.val().name);
+                console.log(snapshot.val().profession1);
+          
+              }, function(errorObject) {
+                console.log("Errors handled: " + errorObject.code);
+              });
+          }
           
            function pushInfoInFireBase(){
             database.ref().push( {
