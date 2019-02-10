@@ -56,10 +56,11 @@
       var userLongitude;
       var appId = "ZfRJXkOh1WKLZLV14MDE";
       var appCode = "9NvfebHqxDHv33VtQXDsCg";
+      var lastChildAdded = "";
       var professions = ['Application Developer','Applications Engineer','Associate Developer','Computer Programmer','Developer','Front End Developer','Java Developer','Junior Programmer','Junior Software Engineer','Junior Web Developer','Programmer Analyst','Senior Applications Engineer','Senior Programmer','Senior Software Engineer','Senior System Architect','Senior System Designer','Senior Systems Software Engineer','Senior Web Administrator','Senior Web Developer','Software Architect','Software Developer','Software Engineer','Software Quality Assurance Analyst','Student','System Architect','Systems Software Engineer','Web Administrator','Webmaster']
       
       function createDropdownContent(){
-        
+      
         //User dropdowns + professions
       
         for(var i=0; i< professions.length;i++){
@@ -193,6 +194,13 @@
       
       function getMatchingProfessions(myProf, seekingProf, myLat, myLong){
       
+          // retrieve the last record from `ref`
+          database.ref().endAt().limitToLast(1).on('child_added', function(snapshot) {
+            // all records after the last continue to invoke this function
+            console.log(snapshot.key, snapshot.val().name);
+            lastChildAdded = snapshot.key;
+          });
+      
           console.log("searching for "+ seekingProf);
           var matchedPeople = [] ;
       
@@ -202,25 +210,27 @@
             //so commented that out
             // console.log(snapshot.key);
       
-            if(snapshot.val().profession2 == myProf) {
-              // && isCloseBy(snapshot.val().userLat,snapshot.val().userLong, myLat, myLong)
+            if(snapshot.val().profession2 == myProf){
+                // && isCloseBy(snapshot.val().userLat,snapshot.val().userLong, myLat, myLong)
       
-              // console.log(snapshot.val());
-              console.log(snapshot.val().name);
-              console.log(snapshot.val().profession1);
-              console.log(snapshot.val().profession2);
-              matchedPeople.push(snapshot.val().name);
-      
-          }
+              if(snapshot.key == lastChildAdded){
+                //do nothing
+              }else{
+                    console.log(snapshot.val().name);
+                    console.log(snapshot.val().profession1);
+                    console.log(snapshot.val().profession2);
+                    matchedPeople.push(snapshot.val().name);
+              }
+            }
           }, function(errorObject) {
-            console.log("Errors handled: " + errorObject.code);
+              console.log("Errors handled: " + errorObject.code);
           });
       
             console.log(matchedPeople.length + " people matched");
             console.log("Matched People are " + matchedPeople);
       }
       
-       function pushInfoInFireBase(){
+      function pushInfoInFireBase(){
         database.ref().push( {
               name: userName,
               email: userEmail,
@@ -229,9 +239,9 @@
               userLat: userLatitude,
               userLong: userLongitude,
               dateAdded: firebase.database.ServerValue.TIMESTAMP
-            });
-            getMatchingProfessions(user1Prof,user2Prof, userLatitude, userLongitude); 
-       }
+        });
+        getMatchingProfessions(user1Prof,user2Prof, userLatitude, userLongitude); 
+      }
     </script>
   </body>
 </html>
