@@ -31,7 +31,7 @@
     </form>
     <!-- JQuery -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/5.8.2/firebase.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.13.0/firebase.js"></script>
     <script>
       // Initialize Firebase
       var config = {
@@ -44,21 +44,32 @@
       };
       firebase.initializeApp(config);
       
+      //For Here API
+      var appId = "ZfRJXkOh1WKLZLV14MDE";
+      var appCode = "9NvfebHqxDHv33VtQXDsCg";
+
+      // populated by here api
+      var geoAddress;
+      var locationId;
+      var userLatitude;
+      var userLongitude;
+
+      //firebase database
       var database = firebase.database();
+
+      //variable to read data from form
       var userName = "";
       var userEmail = "";
       var user1Prof = "";
       var user2Prof = "";
       var userAddress;
-      var geoAddress;
-      var locationId;
-      var userLatitude;
-      var userLongitude;
-      var appId = "ZfRJXkOh1WKLZLV14MDE";
-      var appCode = "9NvfebHqxDHv33VtQXDsCg";
-      var lastChildAdded = "";
-      var professions = ['Application Developer','Applications Engineer','Associate Developer','Computer Programmer','Developer','Front End Developer','Java Developer','Junior Programmer','Junior Software Engineer','Junior Web Developer','Programmer Analyst','Senior Applications Engineer','Senior Programmer','Senior Software Engineer','Senior System Architect','Senior System Designer','Senior Systems Software Engineer','Senior Web Administrator','Senior Web Developer','Software Architect','Software Developer','Software Engineer','Software Quality Assurance Analyst','Student','System Architect','Systems Software Engineer','Web Administrator','Webmaster']
       
+      //stores last child values
+      var lastChildAdded = null;
+      var distanceThreshold = 5;
+
+      //list of professions
+      var professions = ['Application Developer','Applications Engineer','Associate Developer','Computer Programmer','Developer','Front End Developer','Java Developer','Junior Programmer','Junior Software Engineer','Junior Web Developer','Programmer Analyst','Senior Applications Engineer','Senior Programmer','Senior Software Engineer','Senior System Architect','Senior System Designer','Senior Systems Software Engineer','Senior Web Administrator','Senior Web Developer','Software Architect','Software Developer','Software Engineer','Software Quality Assurance Analyst','Student','System Architect','Systems Software Engineer','Web Administrator','Webmaster']      
       function createDropdownContent(){
       
         //User dropdowns + professions
@@ -79,7 +90,6 @@
             console.log('Prof2:', user2Prof);
         });
       }
-      createDropdownContent();
       
       function setUserInfo(){
         userName = $("#username").val().trim();
@@ -88,89 +98,91 @@
         user2Prof = $("#profession2").val().trim();
       }
       function getUserGeoAddress (latitude, longitude) {
-      $.ajax({
-       url: 'https://reverse.geocoder.api.here.com/6.2/reversegeocode.json?prox=' + userLatitude + ',' + userLongitude + '',
-       type: 'GET',
-       dataType: 'jsonp',
-       jsonp: 'jsoncallback',
-       data: {
-         mode: 'retrieveAddresses',
-         maxresults: '1',
-         gen: '9',
-         app_id: 'h8bxzedipYeOeMK6Yyi0',
-         app_code: 'Zte-5udXFmEcJ8-43bG6_g'
-       },
-       success: function (data) {
-        geoAddress = data.Response.View[0].Result[0].Location.Address.City +"," + " " + data.Response.View[0].Result[0].Location.Address.State + " " + data.Response.View[0].Result[0].Location.Address.PostalCode;
-        $('#userAddress').val(geoAddress);
-        userAddress = geoAddress;
-        console.log(userAddress);
-      }
-      });
+        $.ajax({
+         url: 'https://reverse.geocoder.api.here.com/6.2/reversegeocode.json?prox=' + userLatitude + ',' + userLongitude + '',
+         type: 'GET',
+         dataType: 'jsonp',
+         jsonp: 'jsoncallback',
+         data: {
+           mode: 'retrieveAddresses',
+           maxresults: '1',
+           gen: '9',
+           app_id: 'h8bxzedipYeOeMK6Yyi0',
+           app_code: 'Zte-5udXFmEcJ8-43bG6_g'
+         },
+         success: function (data) {
+          geoAddress = data.Response.View[0].Result[0].Location.Address.City +"," + " " + data.Response.View[0].Result[0].Location.Address.State + " " + data.Response.View[0].Result[0].Location.Address.PostalCode;
+          $('#userAddress').val(geoAddress);
+          userAddress = geoAddress;
+          console.log(userAddress);
+        }
+        });
       };
-      
-      if ("geolocation" in navigator) {
-      
-      // check if geolocation is supported/enabled on current browser
-      navigator.geolocation.getCurrentPosition(
-      
-       function success(position) {
-         // for when getting location is a success
-      
-         console.log('latitude', position.coords.latitude,'longitude', position.coords.longitude);
-         userLatitude = position.coords.latitude;
-         userLongitude = position.coords.longitude;
-         
-         getUserGeoAddress(userLatitude, userLongitude);
-      
-         $("#go").on("click",function(){
-          event.preventDefault();
-          setUserInfo();
-          pushInfoInFireBase();
-         });
-       },
-       function error(error_message) {
-        // for when getting location results in an error
-        console.error('An error has occured while retrieving location', error_message);
-        alert("Please enter your address to continue.");
-        getAddressByTextInput();
-      
-      });
-      } else {
-        // geolocation is not supported
-        // get your location some other way
-        console.log('geolocation is not enabled on this browser');
-        alert("Please enter your address to continue.");
-        //getAddressByTextInput();
+
+      function intializeUserGeo(){
+        if ("geolocation" in navigator) {
+        
+        // check if geolocation is supported/enabled on current browser
+        navigator.geolocation.getCurrentPosition(
+        
+         function success(position) {
+           // for when getting location is a success
+        
+           console.log('latitude', position.coords.latitude,'longitude', position.coords.longitude);
+           userLatitude = position.coords.latitude;
+           userLongitude = position.coords.longitude;
+           
+           getUserGeoAddress(userLatitude, userLongitude);
+        
+           $("#go").on("click",function(){
+            event.preventDefault();
+            setUserInfo();
+            pushInfoInFireBase();
+           });
+         },
+         function error(error_message) {
+          // for when getting location results in an error
+          console.error('An error has occured while retrieving location', error_message);
+          alert("Please enter your address to continue.");
+          getAddressByTextInput();
+        
+        });
+        } else {
+          // geolocation is not supported
+          // get your location some other way
+          console.log('geolocation is not enabled on this browser');
+          alert("Please enter your address to continue.");
+          //getAddressByTextInput();
+        }
       }
-      
+
       // stores all users' info in firebase
       function getAddressByTextInput(){
-      $("#go").on("click",function(){
-      
-        event.preventDefault(); 
-      
-        //user info
-        userAddress = $("#userAddress").val().trim();
-        console.log(userAddress);
-        setUserInfo();
-      
-        //autocomplete text key (used for getting location id of user address)
-        var locIdURL = "http://autocomplete.geocoder.api.here.com/6.2/suggest.json?app_id="+appId+"&app_code="+appCode+"&query="+userAddress+"&beginHighlight=<b>&endHighlight=</b>";
-      
-        $.ajax({
-          url: locIdURL,
-          type: "GET"
-        }).then(function(data){
-          // console.log(data);
-      
-            //getting the location id for the user address
-            //chose [0] index as it shows the closest match to the user input
-            locationId = data.suggestions[0].locationId;
-            // console.log(locationId);
-            getUserCoords();   
-          });  
-      });
+        $("#go").on("click",function(){
+        
+          event.preventDefault(); 
+        
+          //user info
+          userAddress = $("#userAddress").val().trim();
+          console.log(userAddress);
+          setUserInfo();
+        
+          //autocomplete text key (used for getting location id of user address)
+          var locIdURL = "http://autocomplete.geocoder.api.here.com/6.2/suggest.json?app_id="+appId+"&app_code="+appCode+"&query="+userAddress+"&beginHighlight=<b>&endHighlight=</b>";
+        
+          $.ajax({
+            url: locIdURL,
+            type: "GET"
+          }).then(function(data){
+            // console.log(data);
+        
+              //getting the location id for the user address
+              //chose [0] index as it shows the closest match to the user input
+              locationId = data.suggestions[0].locationId;
+              // console.log(locationId);
+              getUserCoords();   
+            });  
+        });
       }
       
       function getUserCoords(){
@@ -191,15 +203,16 @@
             pushInfoInFireBase();
           });
         } 
-
+      
+      function ensureRadianIsAvailable(){
         /** Converts numeric degrees to radians */
-    if (typeof(Number.prototype.toRad) === "undefined") {
-      Number.prototype.toRad = function() {
-        return this * Math.PI / 180;
+        if (typeof(Number.prototype.toRad) === "undefined") {
+          Number.prototype.toRad = function() {
+            return this * Math.PI / 180;
+          }
+        }
       }
-    }
-
-    function distance(lon1, lat1, lon2, lat2) {
+      function distance(lon1, lat1, lon2, lat2) {
         var R = 3958.756; // Radius of the earth in mi
         var dLat = (lat2-lat1).toRad();  // Javascript functions in radians
         var dLon = (lon2-lon1).toRad(); 
@@ -210,70 +223,80 @@
         var d = R * c; // Distance in km
         return d;
       }
-
-    function distanceMatch(dist){
-      if (dist<5){
-        return true;
-      } else {
+      
+      function distanceMatch(dist){
+        return dist<distanceThreshold;
+      }
+      
+      function isCloseBy(currUser, pastUser){
+        var dist = distance(pastUser.val().userLong, pastUser.val().userLat, currUser.val().userLong, currUser.val().userLat);
+        return distanceMatch(dist);
+      }
+      
+      function matchPeople(currUser, pastUser){
+        console.log("Trying to match " +  currUser.val().name + " and " + pastUser.val().name)
+        if(!currUser.val().matched && !pastUser.val().matched){
+          console.log("trying to match "+  currUser.val().name + " and " + pastUser.val().name + " because both of them are unmatched");
+        
+        //db.ref("-Users/-KUanJA9egwmPsJCxXpv/displayName").set("New trainer");
+          
+          database.ref(currUser.key+"/matched").set(true);
+          database.ref(pastUser.key+"/matched").set(true);
+          database.ref(currUser.key+"/matchedWith").set(pastUser.key);
+          database.ref(pastUser.key+"/matchedWith").set(currUser.key);
+          database.ref(currUser.key+"/matchedOn").set(firebase.database.ServerValue.TIMESTAMP);
+          database.ref(pastUser.key+"/matchedOn").set(firebase.database.ServerValue.TIMESTAMP);
+          return true;
+        }
         return false;
       }
-    }
-
-    function isCloseBy(theirLong, theirLat, myLong, myLat){
-
-      var dist = distance(theirLong, theirLat, myLong, myLat);
-      return distanceMatch(dist);
-    }   
       
-      function getMatchingProfessions(myProf, seekingProf, myLat, myLong){
+      function getMatchingProfessions(){
       
-          // retrieve the last record from `ref`
-          database.ref().endAt().limitToLast(1).on('child_added', function(snapshot) {
-            // all records after the last continue to invoke this function
-            console.log(snapshot.key, snapshot.val().name);
-            lastChildAdded = snapshot.key;
-          });
-      
-          console.log("searching for "+ seekingProf);
-          var matchedPeople = [] ;
-      
-          //this is useful code for logging all users with same profession.
-          database.ref().orderByChild("profession1").equalTo(seekingProf).on("child_added", function(snapshot) {
-            // snapshot.key gives the unique alphanumerical key of user
-            //so commented that out
-            // console.log(snapshot.key);
-      
-            if((snapshot.val().profession2 == myProf) && isCloseBy(snapshot.val().userLong,snapshot.val().userLat, myLong, myLat)){
-      
-              if(snapshot.key == lastChildAdded){
-                //do nothing
-              }else{
-                  console.log("Got matched with " + snapshot.val().name);
-                  console.log("Who is a " + snapshot.val().profession1);
-                  console.log("Who is looking for " + snapshot.val().profession2);
-                  matchedPeople.push(snapshot.val().name);
+        database.ref().endAt().limitToLast(1).on('child_added', function(snapshot) {
+            lastChildAdded = snapshot;
+        });
+        console.log("My details "+ JSON.stringify(lastChildAdded));
+        
+        database.ref().orderByChild("myProfession").equalTo(lastChildAdded.val().seekingProf).on("child_added", function(snapshot2) {
+            if( (snapshot2.val().seekingProf == lastChildAdded.val().myProfession) 
+             && isCloseBy(lastChildAdded, snapshot2) 
+             && (snapshot2.key != lastChildAdded.key)
+             && (!snapshot2.val().matched)){
+                if(matchPeople(lastChildAdded, snapshot2)){
+                  lastChildAdded.val().matched = true;
+                  console.log("Matched with" +  JSON.stringify(snapshot2));
                 }
-            }
-          }, function(errorObject) {
-              console.log("Errors handled: " + errorObject.code);
-          });
-      
-            console.log(matchedPeople.length + " people matched");
-            console.log("Matched People are " + matchedPeople);
+          }
+        });
+        database.ref().endAt().limitToLast(1).on('child_added', function(snapshot) {
+            lastChildAdded = snapshot;
+        });
       }
       
       function pushInfoInFireBase(){
         database.ref().push( {
               name: userName,
               email: userEmail,
-              profession1: user1Prof,
-              profession2: user2Prof,
+              myProfession: user1Prof,
+              seekingProf: user2Prof,
               userLat: userLatitude,
               userLong: userLongitude,
-              dateAdded: firebase.database.ServerValue.TIMESTAMP
-        });
-        getMatchingProfessions(user1Prof,user2Prof, userLatitude, userLongitude); 
+              dateAdded: firebase.database.ServerValue.TIMESTAMP,
+              matched: false,
+              matchedWith: "",
+              matchedOn: ""
+            });
+        getMatchingProfessions();
       }
+
+      function init (){
+        ensureRadianIsAvailable();
+        createDropdownContent();
+        intializeUserGeo();
+      }
+
+      init();
     </script>
   </body>
 </html>
