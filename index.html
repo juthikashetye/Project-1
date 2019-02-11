@@ -47,16 +47,23 @@
       //For Here API
       var appId = "ZfRJXkOh1WKLZLV14MDE";
       var appCode = "9NvfebHqxDHv33VtQXDsCg";
-
+      
       // populated by here api
       var geoAddress;
       var locationId;
       var userLatitude;
       var userLongitude;
-
+      var midPoint;
+      
+      //for HERE coffee/tea code
+      var suggestedLocations;
+      var selectedLocation;
+      var restLat;
+      var restLong;
+      
       //firebase database
       var database = firebase.database();
-
+      
       //variable to read data from form
       var userName = "";
       var userEmail = "";
@@ -66,10 +73,10 @@
       
       //stores last child values
       var lastChildAdded = null;
-
+      
       //max distance between 2 users in miles
       var distanceThreshold = 5;
-
+      
       //list of professions
       var professions = ['Application Developer','Applications Engineer','Associate Developer','Computer Programmer','Developer','Front End Developer','Java Developer','Junior Programmer','Junior Software Engineer','Junior Web Developer','Programmer Analyst','Senior Applications Engineer','Senior Programmer','Senior Software Engineer','Senior System Architect','Senior System Designer','Senior Systems Software Engineer','Senior Web Administrator','Senior Web Developer','Software Architect','Software Developer','Software Engineer','Software Quality Assurance Analyst','Student','System Architect','Systems Software Engineer','Web Administrator','Webmaster']      
       function createDropdownContent(){
@@ -120,7 +127,7 @@
         }
         });
       };
-
+      
       function intializeUserGeo(){
         if ("geolocation" in navigator) {
         
@@ -140,6 +147,7 @@
             event.preventDefault();
             setUserInfo();
             pushInfoInFireBase();
+            
            });
          },
          function error(error_message) {
@@ -157,7 +165,7 @@
           //getAddressByTextInput();
         }
       }
-
+      
       // stores all users' info in firebase
       function getAddressByTextInput(){
         $("#go").on("click",function(){
@@ -214,7 +222,7 @@
           }
         }
       }
-
+      
       function ensureDegreesIsAvailable(){
         //-- Define degrees function
         if (typeof (Number.prototype.toDeg) === "undefined") {
@@ -223,7 +231,7 @@
             }
         }
       }
-
+      
       function distance(lon1, lat1, lon2, lat2) {
         var R = 3958.756; // Radius of the earth in mi
         var dLat = (lat2-lat1).toRad();  // Javascript functions in radians
@@ -244,30 +252,54 @@
         var dist = distance(pastUser.val().userLong, pastUser.val().userLat, currUser.val().userLong, currUser.val().userLat);
         return distanceMatch(dist);
       }
-
+      
       function middlePoint(lng1, lat1, lng2, lat2){
         //-- Longitude difference
         var dLng = (lng2 - lng1).toRad();
-
+      
         //-- Convert to radians
         lat1 = lat1.toRad();
         lat2 = lat2.toRad();
         lng1 = lng1.toRad();
-
+      
         var bX = Math.cos(lat2) * Math.cos(dLng);
         var bY = Math.cos(lat2) * Math.sin(dLng);
         var lat3 = Math.atan2(Math.sin(lat1) + Math.sin(lat2), Math.sqrt((Math.cos(lat1) + bX) * (Math.cos(lat1) + bX) + bY * bY));
         var lng3 = lng1 + Math.atan2(bY, Math.cos(lat1) + bX);
-
+      
         //-- Return result
         return [lng3.toDeg(), lat3.toDeg()];
-
+      
       }
-
+      
       function findMidpointOfUsers(currUser, pastUser){
-        var midPoint = middlePoint(pastUser.val().userLong, pastUser.val().userLat, currUser.val().userLong, currUser.val().userLat);
-
-        console.log(midPoint);
+         midPoint = middlePoint(pastUser.val().userLong, pastUser.val().userLat, currUser.val().userLong, currUser.val().userLat);
+      
+        console.log("Midpoint of users is " + midPoint);
+        console.log("Midpoint Latitude is " + midPoint[1], "Midpoint Longitude is " + midPoint[0]);
+      }
+      
+      function getRestAddress (latitude, longitude) {
+      
+        $.ajax({
+          url: "https://places.cit.api.here.com/places/v1/discover/explore?at=" + midPoint[1] + "," + midPoint[0] + "&cat=coffee-tea&app_id="+appId+"&app_code="+appCode,
+          type: "GET"
+        }).then(function success (data) {
+            // console.log('Suggested locations ', data.results.items)
+            suggestedLocations = data.results.items;
+            // console.log(suggestedLocations)
+            function randomLocation(){
+              var obj_keys = Object.keys(suggestedLocations);
+              var ran_key = obj_keys[Math.floor(Math.random() *obj_keys.length)];
+              selectedLocation = suggestedLocations[ran_key];
+              console.log(selectedLocation);
+              console.log("Selected restaurant latitude is " + selectedLocation.position[0]);
+              console.log("Selected restaurant longitude is " + selectedLocation.position[1]);
+              restLat = selectedLocation.position[0];
+              restLong = selectedLocation.position[1];
+            }
+            randomLocation();
+          });
       }
       
       function matchPeople(currUser, pastUser){
@@ -305,6 +337,7 @@
                   lastChildAdded.val().matched = true;
                   console.log("Matched with " + snapshot2.val().name +" and their details are " + JSON.stringify(snapshot2));
                   findMidpointOfUsers(lastChildAdded, snapshot2);
+                  getRestAddress(restLat, restLong);
                 }
           }
         });
@@ -328,14 +361,14 @@
             });
         getMatchingProfessions();
       }
-
+      
       function init (){
         ensureRadianIsAvailable();
         ensureDegreesIsAvailable();
         createDropdownContent();
         intializeUserGeo();
       }
-
+      
       init();
     </script>
   </body>
