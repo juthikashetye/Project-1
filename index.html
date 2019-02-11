@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Get Geo or Text address of user</title>
+    <title>Project 1</title>
     <style type="text/css">
       .dropdown {
       display:inline-block;
@@ -24,7 +24,7 @@
     </div>
     </p>
     <form>
-      in <input id="userAddress" type="text" name="place" placeholder="Street/Bldg No. , City"><br><br>
+      near <input id="userAddress" type="text" name="place" placeholder="Street/Bldg No. , City"><br><br>
       Name <input id="username" type="text" name="firstname" placeholder="First Name">
       E-mail <input id="email" type="email" name="emailaddress" placeholder="email@address.com"><br><br>
       <button id="go" type="submit" value="Submit">Go</button>
@@ -66,6 +66,8 @@
       
       //stores last child values
       var lastChildAdded = null;
+
+      //max distance between 2 users in miles
       var distanceThreshold = 5;
 
       //list of professions
@@ -212,6 +214,16 @@
           }
         }
       }
+
+      function ensureDegreesIsAvailable(){
+        //-- Define degrees function
+        if (typeof (Number.prototype.toDeg) === "undefined") {
+            Number.prototype.toDeg = function() {
+                return this * (180 / Math.PI);
+            }
+        }
+      }
+
       function distance(lon1, lat1, lon2, lat2) {
         var R = 3958.756; // Radius of the earth in mi
         var dLat = (lat2-lat1).toRad();  // Javascript functions in radians
@@ -225,12 +237,37 @@
       }
       
       function distanceMatch(dist){
-        return dist<distanceThreshold;
+        return dist < distanceThreshold;
       }
       
       function isCloseBy(currUser, pastUser){
         var dist = distance(pastUser.val().userLong, pastUser.val().userLat, currUser.val().userLong, currUser.val().userLat);
         return distanceMatch(dist);
+      }
+
+      function middlePoint(lng1, lat1, lng2, lat2){
+        //-- Longitude difference
+        var dLng = (lng2 - lng1).toRad();
+
+        //-- Convert to radians
+        lat1 = lat1.toRad();
+        lat2 = lat2.toRad();
+        lng1 = lng1.toRad();
+
+        var bX = Math.cos(lat2) * Math.cos(dLng);
+        var bY = Math.cos(lat2) * Math.sin(dLng);
+        var lat3 = Math.atan2(Math.sin(lat1) + Math.sin(lat2), Math.sqrt((Math.cos(lat1) + bX) * (Math.cos(lat1) + bX) + bY * bY));
+        var lng3 = lng1 + Math.atan2(bY, Math.cos(lat1) + bX);
+
+        //-- Return result
+        return [lng3.toDeg(), lat3.toDeg()];
+
+      }
+
+      function findMidpointOfUsers(currUser, pastUser){
+        var midPoint = middlePoint(pastUser.val().userLong, pastUser.val().userLat, currUser.val().userLong, currUser.val().userLat);
+
+        console.log(midPoint);
       }
       
       function matchPeople(currUser, pastUser){
@@ -252,7 +289,8 @@
       }
       
       function getMatchingProfessions(){
-      
+        
+        //retrieve last child added to database
         database.ref().endAt().limitToLast(1).on('child_added', function(snapshot) {
             lastChildAdded = snapshot;
         });
@@ -265,7 +303,8 @@
              && (!snapshot2.val().matched)){
                 if(matchPeople(lastChildAdded, snapshot2)){
                   lastChildAdded.val().matched = true;
-                  console.log("Matched with" +  JSON.stringify(snapshot2));
+                  console.log("Matched with " + snapshot2.val().name +" and their details are " + JSON.stringify(snapshot2));
+                  findMidpointOfUsers(lastChildAdded, snapshot2);
                 }
           }
         });
@@ -292,6 +331,7 @@
 
       function init (){
         ensureRadianIsAvailable();
+        ensureDegreesIsAvailable();
         createDropdownContent();
         intializeUserGeo();
       }
