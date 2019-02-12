@@ -50,13 +50,20 @@
    //list of professions
    var professions = ['Application Developer', 'Applications Engineer', 'Associate Developer', 'Computer Programmer', 'Developer', 'Front End Developer', 'Java Developer', 'Junior Programmer', 'Junior Software Engineer', 'Junior Web Developer', 'Programmer Analyst', 'Senior Applications Engineer', 'Senior Programmer', 'Senior Software Engineer', 'Senior System Architect', 'Senior System Designer', 'Senior Systems Software Engineer', 'Senior Web Administrator', 'Senior Web Developer', 'Software Architect', 'Software Developer', 'Software Engineer', 'Software Quality Assurance Analyst', 'Student', 'System Architect', 'Systems Software Engineer', 'Web Administrator', 'Webmaster'];
 
-   function hideResults() {
-     $("#results").hide();
+   function hideMatchedResults() {
+     $("#matchedResults").hide();
    }
 
-   function showResults() {
-     // $("#mainContent").hide();
-     $("#results").show();
+   function showMatchedResults() {
+     $("#matchedResults").show();
+   }
+
+   function hideUnmatchedResults() {
+    $("#unmatchedResults").hide();
+   }
+
+   function showUnmatchedResults() {
+    $("#unmatchedResults").show();
    }
 
    function hideMainContent() {
@@ -347,16 +354,16 @@
            findMidpointOfUsers(lastChildAdded, snapshot2);
            getRestAddress(restLat, restLong);
            hideMainContent();
-           loadMatchedResultPage();
-           showResults();
+           loadMatchedResultContent();
+           showMatchedResults();
          }
        } else if ((snapshot2.val().seekingProf != lastChildAdded.val().myProfession) ||
          !isCloseBy(lastChildAdded, snapshot2) ||
          (snapshot2.key == lastChildAdded.key) ||
          (snapshot2.val().matched)) {
-         hideResults();
-         loadUnmatchedResultPage();
-         showMainContent();
+         hideMatchedResults();
+         hideMainContent();
+         showUnmatchedResults();
        }
      });
      database.ref().endAt().limitToLast(1).on('child_added', function(snapshot) {
@@ -410,14 +417,15 @@
      }).call(this, OPTIONS);
    }
 
-   function loadMatchedResultPage() {
+   function loadMatchedResultContent() {
      $("#myName").html(myName);
      $("#matchName").html(matchedPersonName);
    }
 
-   function loadUnmatchedResultPage() {
-     $("#mainContent").html("Sorry, we couldn't find you a match right now. We will notify you know when we find one.");
-   }
+   // function loadUnmatchedResultPage() {
+   //   // $("#mainContent").html("Sorry, we couldn't find you a match right now. We will notify you know when we find one.");
+
+   // }
 
    function pushInfoInFireBase() {
      database.ref().push({
@@ -436,7 +444,8 @@
    }
 
    function init() {
-     hideResults();
+     hideMatchedResults();
+     hideUnmatchedResults();
      ensureRadianIsAvailable();
      ensureDegreesIsAvailable();
      createDropdownContent();
