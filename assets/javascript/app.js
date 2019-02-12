@@ -55,8 +55,16 @@
    }
 
    function showResults() {
-     $("#mainContent").hide();
+     // $("#mainContent").hide();
      $("#results").show();
+   }
+
+   function hideMainContent() {
+     $("#mainContent").hide();
+   }
+
+   function showMainContent() {
+     $("#mainContent").show();
    }
 
    function createDropdownContent() {
@@ -338,18 +346,18 @@
            userLongitude = lastChildAdded.val().userLong;
            findMidpointOfUsers(lastChildAdded, snapshot2);
            getRestAddress(restLat, restLong);
-           // loadMapAndLyft();
+           hideMainContent();
            loadMatchedResultPage();
            showResults();
          }
+       } else if ((snapshot2.val().seekingProf != lastChildAdded.val().myProfession) ||
+         !isCloseBy(lastChildAdded, snapshot2) ||
+         (snapshot2.key == lastChildAdded.key) ||
+         (snapshot2.val().matched)) {
+         hideResults();
+         loadUnmatchedResultPage();
+         showMainContent();
        }
-       //   else if((snapshot2.val().seekingProf != lastChildAdded.val().myProfession) ||
-       //   !isCloseBy(lastChildAdded, snapshot2) ||
-       //   (snapshot2.key == lastChildAdded.key) ||
-       //   (snapshot2.val().matched)) {
-       //   loadUnmatchedResultPage();
-
-       // }
      });
      database.ref().endAt().limitToLast(1).on('child_added', function(snapshot) {
        lastChildAdded = snapshot;
@@ -403,14 +411,12 @@
    }
 
    function loadMatchedResultPage() {
-
      $("#myName").html(myName);
      $("#matchName").html(matchedPersonName);
-
    }
 
    function loadUnmatchedResultPage() {
-     $("body").text("Sorry, we couldn't find you a match right now. We will notify you know when we find one.")
+     $("#mainContent").html("Sorry, we couldn't find you a match right now. We will notify you know when we find one.");
    }
 
    function pushInfoInFireBase() {
