@@ -10,43 +10,48 @@
       #userAddress{
       width:200px;
       }
+      #gmap_canvas2 {
+      width: 600px;
+      height: 450px; 
+      border: 0;
+      }
     </style>
   </head>
   <body>
-    
     <div id="mainContent">
-    <div class="dropdown" id="user1">
-      <span>I'm </span>
-      <select id="profession1"></select>
+      <div class="dropdown" id="user1">
+        <span>I'm </span>
+        <select id="profession1"></select>
+      </div>
+      <span>who wants to meetup with </span>
+      <div class="dropdown" id="user2">
+        <select id="profession2"></select>
+      </div>
+      <br><br>
+      <form>
+        near <input id="userAddress" type="text" name="place" placeholder="Street/Bldg No. , City"><br><br>
+        Name <input id="username" type="text" name="firstname" placeholder="First Name">
+        E-mail <input id="email" type="email" name="emailaddress" placeholder="email@address.com"><br><br>
+        <button id="go" type="submit" value="Submit">Go</button>
+      </form>
     </div>
-    <span>who wants to meetup with </span>
-    <div class="dropdown" id="user2">
-      <select id="profession2"></select>
-    </div><br><br>
-    
-    <form>
-      near <input id="userAddress" type="text" name="place" placeholder="Street/Bldg No. , City"><br><br>
-      Name <input id="username" type="text" name="firstname" placeholder="First Name">
-      E-mail <input id="email" type="email" name="emailaddress" placeholder="email@address.com"><br><br>
-      <button id="go" type="submit" value="Submit">Go</button>
-    </form>
-    </div>
-    
     <div id="results">
       <p>Hey <span id="myName"></span>, we found you a match!</p>
       <p>You are meeting <span id="matchName"></span> at <span id="selectedLoc"></span></p>
-
       <!-- Div for Map iframe -->
-      <div></div>
-
+      <div id="map">
+        <iframe class="embed-responsive-item" src="" id="gmap_canvas2"></iframe>
+      </div>
+      <div id="lyft-web-button-parent"></div>
       <div>
         <p>Click the Lyft button to request a ride or see the map for directions to the location we picked for you.</p>
         <p>Enjoy!</p>
       </div>
-  </div>
+    </div>
     <!-- JQuery -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/4.13.0/firebase.js"></script>
+    <script src= "./assets/javascript/lyftWebButton.min.js"></script>
     <script src= "./assets/javascript/app.js"></script>
   </body>
 </html>

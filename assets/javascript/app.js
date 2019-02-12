@@ -291,6 +291,7 @@
          restName = selectedLocation.title;
          $("#selectedLoc").html(restName);
          console.log(restName);
+         loadMapAndLyft();
        }
        randomLocation();
      });
@@ -333,15 +334,21 @@
            lastChildAdded.val().matched = true;
            console.log("Matched with " + snapshot2.val().name + " and their details are " + JSON.stringify(snapshot2));
            matchedPersonName = snapshot2.val().name;
+           userLatitude = lastChildAdded.val().userLat;
+           userLongitude = lastChildAdded.val().userLong;
            findMidpointOfUsers(lastChildAdded, snapshot2);
            getRestAddress(restLat, restLong);
-
+           // loadMapAndLyft();
            loadMatchedResultPage();
            showResults();
          }
        }
-       // else {
+       //   else if((snapshot2.val().seekingProf != lastChildAdded.val().myProfession) ||
+       //   !isCloseBy(lastChildAdded, snapshot2) ||
+       //   (snapshot2.key == lastChildAdded.key) ||
+       //   (snapshot2.val().matched)) {
        //   loadUnmatchedResultPage();
+
        // }
      });
      database.ref().endAt().limitToLast(1).on('child_added', function(snapshot) {
@@ -349,10 +356,57 @@
      });
    }
 
+   function loadMapAndLyft() {
+
+     //For embedded map
+     var gmapCanvas = document.querySelector('#gmap_canvas2');
+     var origin = userLatitude + "," + userLongitude //'userLatitude,userLongitude'
+     var destination = restLat + "," + restLong //Destination Lat/Lon
+     var gMapApiKey = 'YOUR API KEY'
+
+     gmapCanvas.src = src = "https://www.google.com/maps/embed/v1/directions?origin=" + userLatitude + "," + userLongitude + "&destination=" + restLat + "," + restLong + "&mode=driving&mode=walking&mode=transit&key=" + gMapApiKey
+
+     //Lyft button for page reload
+     var OPTIONS = {
+       scriptSrc: './assets/javascript/lyftWebButton.min.js',
+       namespace: '',
+       clientId: 'IfVUwWo8Br21',
+       clientToken: 'ulNahyBUpqJ4rIWNYu8hf5UXw4ArAlrJL6zOocAIOTvr+T67SNnVsVxoRRbrYGYBzZ5eL6suAQ5gB/KMBHg0+WiDGGCvJDZjk3iSqrdGkBnam4QagJaZMwU=',
+       location: {
+         pickup: {
+           latitude: userLatitude,
+           longitude: userLongitude,
+         },
+         destination: {
+           latitude: restLat,
+           longitude: restLong,
+         },
+       },
+       parentElement: document.getElementById('lyft-web-button-parent'),
+       queryParams: {
+         credits: ''
+       },
+       theme: 'hot-pink medium',
+     };
+     (function(t) {
+       var n = this.window,
+         e = this.document;
+       n.lyftInstanceIndex = n.lyftInstanceIndex || 0;
+       var a = t.parentElement,
+         c = e.createElement("script");
+       c.async = !0, c.onload = function() {
+         n.lyftInstanceIndex++;
+         var e = t.namespace ? "lyftWebButton" + t.namespace + n.lyftInstanceIndex : "lyftWebButton" + n.lyftInstanceIndex;
+         n[e] = n.lyftWebButton, t.objectName = e, n[e].initialize(t)
+       }, c.src = t.scriptSrc, a.insertBefore(c, a.childNodes[0])
+     }).call(this, OPTIONS);
+   }
+
    function loadMatchedResultPage() {
 
      $("#myName").html(myName);
      $("#matchName").html(matchedPersonName);
+
    }
 
    function loadUnmatchedResultPage() {
