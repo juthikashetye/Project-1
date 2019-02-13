@@ -47,6 +47,9 @@
    //max distance between 2 users in miles
    var distanceThreshold = 5;
 
+   //holds the setTimeout function for displaying unmatched msg
+   var displayUnmatchedMsg;
+
    //list of professions
    var professions = ['Application Developer', 'Applications Engineer', 'Associate Developer', 'Computer Programmer', 'Developer', 'Front End Developer', 'Java Developer', 'Junior Programmer', 'Junior Software Engineer', 'Junior Web Developer', 'Programmer Analyst', 'Senior Applications Engineer', 'Senior Programmer', 'Senior Software Engineer', 'Senior System Architect', 'Senior System Designer', 'Senior Systems Software Engineer', 'Senior Web Administrator', 'Senior Web Developer', 'Software Architect', 'Software Developer', 'Software Engineer', 'Software Quality Assurance Analyst', 'Student', 'System Architect', 'Systems Software Engineer', 'Web Administrator', 'Webmaster'];
 
@@ -65,6 +68,10 @@
    function showUnmatchedResults() {
     $("#unmatchedResults").show();
    }
+
+   function delayUnmatchedMsg() {
+    displayUnmatchedMsg = setTimeout(showUnmatchedResults, 1000);
+    }
 
    function hideMainContent() {
      $("#mainContent").hide();
@@ -353,14 +360,17 @@
            userLongitude = lastChildAdded.val().userLong;
            findMidpointOfUsers(lastChildAdded, snapshot2);
            getRestAddress(restLat, restLong);
+           hideUnmatchedResults();
            hideMainContent();
            loadMatchedResultContent();
            showMatchedResults();
          }
-       } else if ((snapshot2.val().seekingProf != lastChildAdded.val().myProfession) ||
-         !isCloseBy(lastChildAdded, snapshot2) ||
-         (snapshot2.key == lastChildAdded.key) ||
-         (snapshot2.val().matched)) {
+       } else {
+        //this delayUnmatchedMsg() doesn't work as it just 
+        //delays execution of the unMatched results text
+        //and the text shows at the bottom of the screen eventually 
+        //even if there is a match
+        // delayUnmatchedMsg();
          hideMatchedResults();
          hideMainContent();
          showUnmatchedResults();
