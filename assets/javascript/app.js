@@ -171,7 +171,7 @@
        // get your location some other way
        console.log('geolocation is not enabled on this browser');
        alert("Please enter your address to continue.");
-       //getAddressByTextInput();
+       getAddressByTextInput();
      }
    }
 
