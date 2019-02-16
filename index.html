@@ -5,46 +5,28 @@
     <!--Let browser know website is optimized for mobile-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Project 1</title>
-    <style type="text/css">
-      body {
-      display: flex;
-      min-height: 100vh;
-      flex-direction: column;
-      }
-      main {
-      flex: 1 0 auto;
-      margin: 5%;
-      }
-      .dropdown {
-      display:inline-block;
-      }
-      /*#userAddress{
-      width:200px;
-      }*/
-      #gmap_canvas2 {
-      width: 600px;
-      height: 450px; 
-      border: 0;
-      }
-    </style>
     <!--clear css-->
     <link rel="stylesheet" href="./assets/css/reset.css">
     <!--Import Google Icon Font-->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!--Import materialize.css-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- style.css -->
+    <link rel="stylesheet" type="text/css" href="./assets/css/style.css">
     
   </head>
   <body>
     <!--Navigation-->   
     <nav>
       <div class="z-depth-0 nav-wrapper">
+        <div class="container">
         <a href="#!" class="brand-logo">muirl</a>
         <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
         <ul class="right hide-on-med-and-down">
           <li><a href="#">Login</a></li>
           <li><a href="#">About</a></li>
         </ul>
+        </div>
       </div>
     </nav>
     <!--Mobile nav-->   
@@ -61,13 +43,13 @@
               <select id="profession1">
                 <option value="" disabled selected>Select</option>
               </select>
-              <label>I'm a(n)</label>
+              <label class="selfLabel">I'm a(n)</label>
             </div>
             <div class="dropdown input-field col s12 m6 l6" id="user2">
               <select id="profession2">
                 <option value="" disabled selected>Select</option>
               </select>
-              <label>who wants to meetup with a(n)</label>
+              <label class="selfLabel">who wants to meetup with a(n)</label>
             </div>
           </div>
           <!--Input-->
@@ -125,9 +107,9 @@
     </main>
     <!--Footer-->
     <footer class="page-footer">
-      <div class="footer-copyright container">
+      <div class="transparentBg footer-copyright container">
         <!-- <div class="container"> -->
-        © 2019 muirl
+        <span>© 2019 muirl</span>
         <a class="grey-text text-lighten-4 right" href="#!">Meet up in real life!</a>
         <!-- </div> -->
       </div>
