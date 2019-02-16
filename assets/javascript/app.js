@@ -69,10 +69,6 @@
    $("#unmatchedResults").show();
  }
 
- function delayUnmatchedMsg() {
-   displayUnmatchedMsg = setTimeout(showUnmatchedResults, 1000);
- }
-
  function hideMainContent() {
    $("#mainContent").hide();
  }
@@ -137,6 +133,14 @@
    });
  };
 
+ function autofill(){
+  $("#autofill").on("click",function(){
+    event.preventDefault();
+    $("#autofill").addClass("clicked");
+    intializeUserGeo();
+  });
+ }
+
  function intializeUserGeo() {
    if ("geolocation" in navigator) {
 
@@ -163,15 +167,14 @@
          // for when getting location results in an error
          console.error('An error has occured while retrieving location', error_message);
          alert("Please enter your address to continue.");
-         getAddressByTextInput();
-
+         $("#autofill").removeClass("clicked");
        });
    } else {
      // geolocation is not supported
      // get your location some other way
      console.log('geolocation is not enabled on this browser');
      alert("Please enter your address to continue.");
-     getAddressByTextInput();
+     $("#autofill").removeClass("clicked");
    }
  }
 
@@ -184,26 +187,31 @@
      if (userAddress == "") {
        alert("Please enter a valid address to continue");
      } else {
-       //user info
-       userAddress = $("#userAddress").val().trim();
-       console.log(userAddress);
-       setUserInfo();
 
-       //autocomplete text key (used for getting location id of user address)
-       var locIdURL = "http://autocomplete.geocoder.api.here.com/6.2/suggest.json?app_id=" + appId + "&app_code=" + appCode + "&query=" + userAddress + "&beginHighlight=<b>&endHighlight=</b>";
+        if (!($("#autofill").hasClass("clicked"))){
+         //user info
+         userAddress = $("#userAddress").val().trim();
+         console.log(userAddress);
+         setUserInfo();
 
-       $.ajax({
-         url: locIdURL,
-         type: "GET"
-       }).then(function(data) {
-         // console.log(data);
+         //autocomplete text key (used for getting location id of user address)
+         var locIdURL = "http://autocomplete.geocoder.api.here.com/6.2/suggest.json?app_id=" + appId + "&app_code=" + appCode + "&query=" + userAddress + "&beginHighlight=<b>&endHighlight=</b>";
 
-         //getting the location id for the user address
-         //chose [0] index as it shows the closest match to the user input
-         locationId = data.suggestions[0].locationId;
-         // console.log(locationId);
-         getUserCoords();
-       });
+         $.ajax({
+           url: locIdURL,
+           type: "GET"
+         }).then(function(data) {
+           // console.log(data);
+
+           //getting the location id for the user address
+           //chose [0] index as it shows the closest match to the user input
+           locationId = data.suggestions[0].locationId;
+           // console.log(locationId);
+           getUserCoords();
+         });
+       }else {
+        return null;
+       }
      }
    });
  }
@@ -366,11 +374,6 @@
          showMatchedResults();
        }
      } else {
-       //this delayUnmatchedMsg() doesn't work as it just 
-       //delays execution of the unMatched results text
-       //and the text shows at the bottom of the screen eventually 
-       //even if there is a match
-       // delayUnmatchedMsg();
        hideMatchedResults();
        hideMainContent();
        showUnmatchedResults();
@@ -432,11 +435,6 @@
    $("#matchName").html(matchedPersonName);
  }
 
- // function loadUnmatchedResultPage() {
- //   // $("#mainContent").html("Sorry, we couldn't find you a match right now. We will notify you know when we find one.");
-
- // }
-
  function pushInfoInFireBase() {
    database.ref().push({
      name: userName,
@@ -459,7 +457,8 @@
    ensureRadianIsAvailable();
    ensureDegreesIsAvailable();
    createDropdownContent();
-   intializeUserGeo();
+   getAddressByTextInput();
+   autofill();
  }
 
  init();
