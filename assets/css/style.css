@@ -21,8 +21,17 @@ main {
 
 .page-footer .transparentBg {
   background-color: transparent;
+  justify-content: center;
 }
 
 .input-field>label {
   font-size: 1.1rem;
+}
+
+footer span {
+      margin-right: 2%;
+}
+
+footer a {
+     margin-left: 2%; 
 }
