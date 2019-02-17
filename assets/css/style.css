@@ -9,11 +9,22 @@ main {
   flex: 1 0 auto;
   margin: 2%;
 }
-
+.nav-container{
+  width: 800px;
+  margin: auto;
+}
+.container{
+  max-width: 700px;
+  padding-top: 35px;
+  
+}
 .dropdown {
   display: inline-block;
 }
 
+p{
+  color: #444444;
+}
 #gmap_canvas2 {
   border: 0;
 }

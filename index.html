@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -19,7 +19,7 @@
     <!--Navigation-->   
     <nav>
       <div class="z-depth-0 nav-wrapper">
-        <div class="container">
+        <div class="nav-container">
         <a href="#!" class="brand-logo">muirl</a>
         <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
         <ul class="right hide-on-med-and-down">
@@ -42,7 +42,7 @@
     <!--Mobile nav-->   
     <ul class="sidenav" id="mobile-demo">
       <li><a href="#">Login</a></li>
-      <li><a href="#">About</a></li>
+      <li><a href="#modal1" class="modal-trigger">About</a></li>
     </ul>
     <!--Main-->   
     <main>
@@ -70,7 +70,7 @@
               </div>
               <div class="input-field col s10 m11 l8 offset-s1 offset-l2">
                 <input id="userAddress" type="text" name="place" placeholder="City, State Zip">
-                <label for="userAddress">Near:</label> 
+                <label class="active" for="userAddress">Near:</label> 
               </div>
               <div class="row center-align hide-on-med-and-down">
                 <button id="autofill-large" class="btn waves-effect waves-light hide-on-med-and-down " type="submit" name="action"><i class="material-icons left">add_location</i>Use my location
@@ -97,22 +97,35 @@
         <!--Results-->
         <div class="row center-align" id="matchedResults">
           <div class="col s12">
-            <p>Hey <span id="myName"></span>, we found you a match!</p>
-            <p>You are meeting <span id="matchName"></span> at <span id="selectedLoc"></span></p>
+            <div class="section">
+              <p class="flow-text">Hey <span id="myName"></span>, we found you a match!</p>
+            </div>
+            <div class="section">
+              <p class="flow-text">You are meeting <span id="matchName"></span> at <span id="selectedLoc"></span></p>
+            </div>
             <!--iframe -->
             <div class="video-container" id="map">
               <iframe class="embed-responsive-item" src="" id="gmap_canvas2"></iframe>
             </div>
-            <div id="lyft-web-button-parent"></div>
-            <div>
-              <p>Click the Lyft button to request a ride or see the map for directions to the location we picked for you.</p>
-              <p>Enjoy!</p>
+            <div class="section">           
+              <div id="lyft-web-button-parent"></div>
+            </div>
+            <div class="section">
+              <p class="flow-text">Click the Lyft button to request a ride or see the map for directions to the location we picked for you.</p>
+            </div>
+            <div class="section">
+              <p class="flow-text">Enjoy!</p>
             </div>
           </div>
         </div>
         <div class="row center-align" id="unmatchedResults">
           <div class="col s12">
-            <p>Sorry, we couldn't find you a match right now. We will notify you know when we find one.</p>
+            <div class="section">
+              <p class="flow-text">Sorry, we couldn't find you a match right now.</p>
+            </div>
+            <div class="section">
+              <p class="flow-text">We'll let you know when we find one.</p>
+            </div>
           </div>
         </div>
       </div>
