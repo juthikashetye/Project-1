@@ -134,9 +134,9 @@
  };
 
  function autofill(){
-  $("#autofill").on("click",function(){
+  $("#autofill-small, #autofill-large").on("click",function(){
     event.preventDefault();
-    $("#autofill").addClass("clicked");
+    $("#autofill-small, #autofill-large").addClass("clicked");
     intializeUserGeo();
   });
  }
@@ -167,14 +167,14 @@
          // for when getting location results in an error
          console.error('An error has occured while retrieving location', error_message);
          alert("Please enter your address to continue.");
-         $("#autofill").removeClass("clicked");
+         $("#autofill-small, #autofill-large").removeClass("clicked");
        });
    } else {
      // geolocation is not supported
      // get your location some other way
      console.log('geolocation is not enabled on this browser');
      alert("Please enter your address to continue.");
-     $("#autofill").removeClass("clicked");
+     $("#autofill-small, #autofill-large").removeClass("clicked");
    }
  }
 
@@ -188,7 +188,7 @@
        alert("Please enter a valid address to continue");
      } else {
 
-        if (!($("#autofill").hasClass("clicked"))){
+        if (!($("#autofill-small, #autofill-large").hasClass("clicked"))){
          //user info
          userAddress = $("#userAddress").val().trim();
          console.log(userAddress);
@@ -390,7 +390,7 @@
    var gmapCanvas = document.querySelector('#gmap_canvas2');
    var origin = userLatitude + "," + userLongitude //'userLatitude,userLongitude'
    var destination = restLat + "," + restLong //Destination Lat/Lon
-   var gMapApiKey = 'YOUR API KEY'
+   var gMapApiKey = ''
 
    gmapCanvas.src = src = "https://www.google.com/maps/embed/v1/directions?origin=" + userLatitude + "," + userLongitude + "&destination=" + restLat + "," + restLong + "&mode=driving&mode=walking&mode=transit&key=" + gMapApiKey
 

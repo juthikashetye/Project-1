@@ -2,6 +2,7 @@ body {
   display: flex;
   min-height: 100vh;
   flex-direction: column;
+  background-color: #eeeeee;
 }
 
 main {
@@ -14,8 +15,6 @@ main {
 }
 
 #gmap_canvas2 {
-  width: 600px;
-  height: 450px;
   border: 0;
 }
 

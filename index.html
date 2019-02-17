@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -24,11 +24,21 @@
         <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
         <ul class="right hide-on-med-and-down">
           <li><a href="#">Login</a></li>
-          <li><a href="#">About</a></li>
+          <li><a href="#modal1" class="modal-trigger">About</a></li>
         </ul>
         </div>
       </div>
     </nav>
+    <!-- Modal Structure -->
+    <div id="modal1" class="modal">
+      <div class="modal-content">
+        <h4>About muirl</h4>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus sagittis erat semper mauris facilisis, vitae finibus mi ultrices. Nunc pulvinar justo vitae mauris eleifend sagittis. Nullam blandit consectetur est, nec tincidunt nisl mollis in. Nunc ac leo eros. Sed vulputate tellus maximus nunc posuere rhoncus.</p>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect waves-green btn-flat">OK</a>
+      </div>
+    </div>
     <!--Mobile nav-->   
     <ul class="sidenav" id="mobile-demo">
       <li><a href="#">Login</a></li>
@@ -39,7 +49,7 @@
       <div class="container">
         <div id="mainContent">
           <div class="row">
-            <div class="dropdown input-field col s12 m6 l6" id="user1">
+            <div class="dropdown input-field col s12 m6 l6 " id="user1">
               <select id="profession1">
                 <option value="" disabled selected>Select</option>
               </select>
@@ -55,15 +65,17 @@
           <!--Input-->
           <form>
             <div class="row">
-              <div class="input-field col s12 m12 l6 ">
-                <input id="userAddress" type="text" name="place" placeholder="City, State Zip" >
-                <label for="userAddress">City, State Zip</label> 
+              <div class="input-field col s1 m1 l3  offset-l2">
+                <button id="autofill-small" class="btn-floating waves-effect hide-on-large-only" type="submit" name="action"><i class="material-icons ">add_location</i></button> 
               </div>
-            </div>
-            <div class="row center-align">
-              <button id="autofill" class="btn waves-effect waves-light" type="submit" name="action">Autofill location ?
-              <i class="material-icons right">location_on</i>
-              </button>
+              <div class="input-field col s10 m11 l8 offset-s1 offset-l2">
+                <input id="userAddress" type="text" name="place" placeholder="City, State Zip">
+                <label for="userAddress">Near:</label> 
+              </div>
+              <div class="row center-align hide-on-med-and-down">
+                <button id="autofill-large" class="btn waves-effect waves-light hide-on-med-and-down " type="submit" name="action"><i class="material-icons left">add_location</i>Use my location
+                </button>
+              </div>
             </div>
             <div class="row">
               <div class="input-field col s12 m6 l6">
@@ -88,7 +100,7 @@
             <p>Hey <span id="myName"></span>, we found you a match!</p>
             <p>You are meeting <span id="matchName"></span> at <span id="selectedLoc"></span></p>
             <!--iframe -->
-            <div id="map">
+            <div class="video-container" id="map">
               <iframe class="embed-responsive-item" src="" id="gmap_canvas2"></iframe>
             </div>
             <div id="lyft-web-button-parent"></div>
@@ -107,10 +119,10 @@
     </main>
     <!--Footer-->
     <footer class="page-footer">
-      <div class="transparentBg footer-copyright container">
+      <div class="transparentBg footer-copyright container grey-text text-lighten-3">
         <!-- <div class="container"> -->
         <span>© 2019 muirl</span>
-        <a class="grey-text text-lighten-4 right" href="#!">Meet up in real life!</a>
+        <a class="grey-text text-lighten-3 right" href="#!">Meet up in real life!</a>
         <!-- </div> -->
       </div>
     </footer>
@@ -125,6 +137,7 @@
       $(document).ready(function(){
       $('select').formSelect();
       $('.sidenav').sidenav();
+      $('.modal').modal();
       });
     </script>
   </body>
