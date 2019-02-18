@@ -100,6 +100,7 @@
 
    $('#user2').change(function() {
      user2Prof = $("#user2 option:selected").text();
+
      console.log('Prof2:', user2Prof);
    });
  }
@@ -133,12 +134,12 @@
    });
  };
 
- function autofill(){
-  $("#autofill-small, #autofill-large").on("click",function(){
-    event.preventDefault();
-    $("#autofill-small, #autofill-large").addClass("clicked");
-    intializeUserGeo();
-  });
+ function autofill() {
+   $("#autofill-small, #autofill-large").on("click", function() {
+     event.preventDefault();
+     $("#autofill-small, #autofill-large").addClass("clicked");
+     intializeUserGeo();
+   });
  }
 
  function intializeUserGeo() {
@@ -188,7 +189,7 @@
        alert("Please enter a valid address to continue");
      } else {
 
-        if (!($("#autofill-small, #autofill-large").hasClass("clicked"))){
+       if (!($("#autofill-small, #autofill-large").hasClass("clicked"))) {
          //user info
          userAddress = $("#userAddress").val().trim();
          console.log(userAddress);
@@ -209,8 +210,8 @@
            // console.log(locationId);
            getUserCoords();
          });
-       }else {
-        return null;
+       } else {
+         return null;
        }
      }
    });

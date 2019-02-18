@@ -13,19 +13,20 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <!-- style.css -->
     <link rel="stylesheet" type="text/css" href="./assets/css/style.css">
-    
+    <!-- Angular JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
   </head>
   <body>
     <!--Navigation-->   
     <nav>
       <div class="z-depth-0 nav-wrapper">
         <div class="nav-container">
-        <a href="#!" class="brand-logo">muirl</a>
-        <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
-        <ul class="right hide-on-med-and-down">
-          <li><a href="#">Login</a></li>
-          <li><a href="#modal1" class="modal-trigger">About</a></li>
-        </ul>
+          <a href="index.html" class="brand-logo">muirl</a>
+          <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+          <ul class="right hide-on-med-and-down">
+            <li><a href="#">Login</a></li>
+            <li><a href="#modal1" class="modal-trigger">About</a></li>
+          </ul>
         </div>
       </div>
     </nav>
@@ -46,7 +47,7 @@
     </ul>
     <!--Main-->   
     <main>
-      <div class="container">
+      <div class="container flow-text">
         <div id="mainContent">
           <div class="row">
             <div class="dropdown input-field col s12 m6 l6 " id="user1">
@@ -63,7 +64,7 @@
             </div>
           </div>
           <!--Input-->
-          <form>
+          <form ng-app="">
             <div class="row">
               <div class="input-field col s1 m1 l3  offset-l2">
                 <button id="autofill-small" class="btn-floating waves-effect hide-on-large-only" type="submit" name="action"><i class="material-icons ">add_location</i></button> 
@@ -77,14 +78,17 @@
                 </button>
               </div>
             </div>
-            <div class="row">
+            <div class="row center-align">
               <div class="input-field col s12 m6 l6">
-                <input id="username" type="text" class="validate" name="firstname">
+                <input id="username" type="text" class="validate" name="firstname" ng-model="name">
                 <label for="username">First Name</label>
               </div>
               <div class="input-field col s12 m6 l6">
                 <input id="email" type="email" class="validate" name="emailaddress" >
                 <label for="email">Email</label>
+              </div>
+              <div class="col s12">
+                <p>Hey {{name}}, let's find you a match!</p>
               </div>
             </div>
             <div class="row center-align">
@@ -97,35 +101,21 @@
         <!--Results-->
         <div class="row center-align" id="matchedResults">
           <div class="col s12">
-            <div class="section">
-              <p class="flow-text">Hey <span id="myName"></span>, we found you a match!</p>
-            </div>
-            <div class="section">
-              <p class="flow-text">You are meeting <span id="matchName"></span> at <span id="selectedLoc"></span></p>
-            </div>
+            <p class="flow-text">Hey <span id="myName"></span>, we found you a match!</p>
+            <p class="flow-text">You are meeting <span id="matchName"></span> at <span id="selectedLoc"></span></p>
             <!--iframe -->
             <div class="video-container" id="map">
               <iframe class="embed-responsive-item" src="" id="gmap_canvas2"></iframe>
             </div>
-            <div class="section">           
-              <div id="lyft-web-button-parent"></div>
-            </div>
-            <div class="section">
-              <p class="flow-text">Click the Lyft button to request a ride or see the map for directions to the location we picked for you.</p>
-            </div>
-            <div class="section">
-              <p class="flow-text">Enjoy!</p>
-            </div>
+            <div class="flow-text" id="lyft-web-button-parent"></div>
+            <p class="flow-text">Click the Lyft button to request a ride or see the map for directions to the location we picked for you.</p>
+            <p class="flow-text">Enjoy!</p>
           </div>
         </div>
         <div class="row center-align" id="unmatchedResults">
           <div class="col s12">
-            <div class="section">
-              <p class="flow-text">Sorry, we couldn't find you a match right now.</p>
-            </div>
-            <div class="section">
-              <p class="flow-text">We'll let you know when we find one.</p>
-            </div>
+            <p class="flow-text">Sorry, we couldn't find you a match right now.</p>
+            <p class="flow-text">We'll let you know when we find one.</p>
           </div>
         </div>
       </div>
@@ -135,7 +125,7 @@
       <div class="transparentBg footer-copyright container grey-text text-lighten-3">
         <!-- <div class="container"> -->
         <span>© 2019 muirl</span>
-        <a class="grey-text text-lighten-3 right" href="#!">Meet up in real life!</a>
+        <a class="grey-text text-lighten-3 right" href="index.html">Meet up in real life!</a>
         <!-- </div> -->
       </div>
     </footer>
