@@ -14,8 +14,6 @@
  var appCode = "9NvfebHqxDHv33VtQXDsCg";
 
  // populated by here api
- var geoAddress;
- var locationId;
  var userLatitude;
  var userLongitude;
  var midPoint;
@@ -52,6 +50,9 @@
 
  //list of professions
  var professions = ['Application Developer', 'Applications Engineer', 'Associate Developer', 'Computer Programmer', 'Developer', 'Front End Developer', 'Java Developer', 'Junior Programmer', 'Junior Software Engineer', 'Junior Web Developer', 'Programmer Analyst', 'Senior Applications Engineer', 'Senior Programmer', 'Senior Software Engineer', 'Senior System Architect', 'Senior System Designer', 'Senior Systems Software Engineer', 'Senior Web Administrator', 'Senior Web Developer', 'Software Architect', 'Software Developer', 'Software Engineer', 'Software Quality Assurance Analyst', 'Student', 'System Architect', 'Systems Software Engineer', 'Web Administrator', 'Webmaster'];
+
+ //so that match happens only once
+ var currentUserMatched = false;
 
  function hideMatchedResults() {
    $("#matchedResults").hide();
@@ -112,9 +113,10 @@
    user2Prof = $("#profession2").val().trim();
  }
 
+ //coverts a long lat to a text address and sets it in the text box
  function getUserGeoAddress(latitude, longitude) {
    $.ajax({
-     url: 'https://reverse.geocoder.api.here.com/6.2/reversegeocode.json?prox=' + userLatitude + ',' + userLongitude + '',
+     url: 'https://reverse.geocoder.api.here.com/6.2/reversegeocode.json?prox=' + latitude + ',' + longitude + '',
      type: 'GET',
      dataType: 'jsonp',
      jsonp: 'jsoncallback',
@@ -126,15 +128,15 @@
        app_code: 'Zte-5udXFmEcJ8-43bG6_g'
      },
      success: function(data) {
-       geoAddress = data.Response.View[0].Result[0].Location.Address.City + "," + " " + data.Response.View[0].Result[0].Location.Address.State + " " + data.Response.View[0].Result[0].Location.Address.PostalCode;
-       $('#userAddress').val(geoAddress);
+       var geoAddress = data.Response.View[0].Result[0].Location.Address.City + ", " + data.Response.View[0].Result[0].Location.Address.State + " " + data.Response.View[0].Result[0].Location.Address.PostalCode;
+       console.log("Geo Addr " + geoAddress);
        userAddress = geoAddress;
-       console.log(userAddress);
+       $('#userAddress').val(userAddress);
      }
    });
- };
+ }
 
- function autofill() {
+ function addListnerOnAutoFill() {
    $("#autofill-small, #autofill-large").on("click", function() {
      event.preventDefault();
      $("#autofill-small, #autofill-large").addClass("clicked");
@@ -142,6 +144,8 @@
    });
  }
 
+ //try to get user geo location from browser and store it in 
+ //global variables (userLatitude, userLongitude, userAddress)
  function intializeUserGeo() {
    if ("geolocation" in navigator) {
 
@@ -154,15 +158,8 @@
          console.log('latitude', position.coords.latitude, 'longitude', position.coords.longitude);
          userLatitude = position.coords.latitude;
          userLongitude = position.coords.longitude;
-
          getUserGeoAddress(userLatitude, userLongitude);
-
-         $("#go").on("click", function() {
-           event.preventDefault();
-           setUserInfo();
-           pushInfoInFireBase();
-
-         });
+         gotUserLocation = true;
        },
        function error(error_message) {
          // for when getting location results in an error
@@ -179,49 +176,55 @@
    }
  }
 
- // stores all users' info in firebase
- function getAddressByTextInput() {
+ function addListenerOnGo() {
    $("#go").on("click", function() {
-
      event.preventDefault();
      userAddress = $("#userAddress").val().trim();
+     console.log(userAddress);
      if (userAddress == "") {
        alert("Please enter a valid address to continue");
      } else {
-
-       if (!($("#autofill-small, #autofill-large").hasClass("clicked"))) {
-         //user info
-         userAddress = $("#userAddress").val().trim();
-         console.log(userAddress);
-         setUserInfo();
-
-         //autocomplete text key (used for getting location id of user address)
-         var locIdURL = "http://autocomplete.geocoder.api.here.com/6.2/suggest.json?app_id=" + appId + "&app_code=" + appCode + "&query=" + userAddress + "&beginHighlight=<b>&endHighlight=</b>";
-
-         $.ajax({
-           url: locIdURL,
-           type: "GET"
-         }).then(function(data) {
-           // console.log(data);
-
-           //getting the location id for the user address
-           //chose [0] index as it shows the closest match to the user input
-           locationId = data.suggestions[0].locationId;
-           // console.log(locationId);
-           getUserCoords();
-         });
-       } else {
-         return null;
-       }
+       getAddressByTextInput();
      }
    });
  }
+ // stores all users' info in firebase
+ function getAddressByTextInput() {
+   if (!($("#autofill-small, #autofill-large").hasClass("clicked"))) {
+     console.log("searching for location id for " + userAddress);
+     //autocomplete text key (used for getting location id of user address)
+     var locIdURL = "http://autocomplete.geocoder.api.here.com/6.2/suggest.json?app_id=" + appId + "&app_code=" + appCode + "&query=" + userAddress + "&beginHighlight=<b>&endHighlight=</b>";
+     console.log("using api " + locIdURL);
+     $.ajax({
+       url: locIdURL,
+       type: "GET"
+     }).then(function(data) {
+       console.log(data);
+       //not alerting this
+       if (data.length == 0 || data == null) {
+         alert("Sorry couldn't find your address, please enter a valid postal address.");
+       }
+       //getting the location id for the user address
+       //chose [0] index as it shows the closest match to the user input
+       locationId = data.suggestions[0].locationId;
+       console.log("Found location id " + locationId);
+       getUserCoords(locationId);
+     });
+   } else {
 
- function getUserCoords() {
+     setUserInfo();
+     pushInfoInFireBase();
+   }
+ }
+
+ //from location id get long and lat and 
+ //store it in global variables (userLatitude, userLongitude)
+ function getUserCoords(locationID) {
+   console.log("searching for cordinates for " + locationID)
 
    //geocoder key (used for getting lat and long from user's location id)
-   var locIdCoordURL = "http://geocoder.api.here.com/6.2/geocode.json?locationid=" + locationId + "&jsonattributes=1&gen=9&app_id=" + appId + "&app_code=" + appCode;
-
+   var locIdCoordURL = "http://geocoder.api.here.com/6.2/geocode.json?locationid=" + locationID + "&jsonattributes=1&gen=9&app_id=" + appId + "&app_code=" + appCode;
+   console.log("using api " + locIdCoordURL)
    $.ajax({
      url: locIdCoordURL,
      type: "GET"
@@ -229,9 +232,9 @@
      // console.log(data);
      userLatitude = data.response.view[0].result[0].location.displayPosition.latitude;
      userLongitude = data.response.view[0].result[0].location.displayPosition.longitude;
-     console.log(userLatitude);
-     console.log(userLongitude);
+     console.log("Latitude " + userLatitude + " Longitude " + userLongitude);
 
+     setUserInfo();
      pushInfoInFireBase();
    });
  }
@@ -270,6 +273,7 @@
    return dist < distanceThreshold;
  }
 
+ //check if users' location are within the distanceThreshold
  function isCloseBy(currUser, pastUser) {
    var dist = distance(pastUser.val().userLong, pastUser.val().userLat, currUser.val().userLong, currUser.val().userLat);
    return distanceMatch(dist);
@@ -298,9 +302,10 @@
    midPoint = middlePoint(pastUser.val().userLong, pastUser.val().userLat, currUser.val().userLong, currUser.val().userLat);
 
    console.log("Midpoint of users is " + midPoint);
-   console.log("Midpoint Latitude is " + midPoint[1], "Midpoint Longitude is " + midPoint[0]);
+   console.log("Midpoint Latitude is " + midPoint[1] + ", " + "Midpoint Longitude is " + midPoint[0]);
  }
 
+ //get suggested restaurant locations near the midpoint of users' locations
  function getRestAddress(latitude, longitude) {
 
    $.ajax({
@@ -310,31 +315,35 @@
      // console.log('Suggested locations ', data.results.items)
      suggestedLocations = data.results.items;
      // console.log(suggestedLocations)
-     function randomLocation() {
-       var obj_keys = Object.keys(suggestedLocations);
-       var ran_key = obj_keys[Math.floor(Math.random() * obj_keys.length)];
-       selectedLocation = suggestedLocations[ran_key];
-       console.log(selectedLocation);
-       console.log("Selected restaurant latitude is " + selectedLocation.position[0]);
-       console.log("Selected restaurant longitude is " + selectedLocation.position[1]);
-       restLat = selectedLocation.position[0];
-       restLong = selectedLocation.position[1];
-       restName = selectedLocation.title;
-       $("#selectedLoc").html(restName);
-       console.log(restName);
-       loadMapAndLyft();
-     }
-     randomLocation();
+     randomLocation(suggestedLocations);
    });
  }
 
+ //from sugested location pick a random location and populate globale variables
+ function randomLocation(suggestedLocations) {
+   var obj_keys = Object.keys(suggestedLocations);
+   var ran_key = obj_keys[Math.floor(Math.random() * obj_keys.length)];
+   selectedLocation = suggestedLocations[ran_key];
+   console.log(selectedLocation);
+   console.log("Selected restaurant latitude is " + selectedLocation.position[0]);
+   console.log("Selected restaurant longitude is " + selectedLocation.position[1]);
+   restLat = selectedLocation.position[0];
+   restLong = selectedLocation.position[1];
+   restName = selectedLocation.title;
+   $("#selectedLoc").html(restName);
+   console.log("restaurant Name is " + restName);
+   //calling map and lyft function here to populate it with
+   //chosen restaurant co-ordinates
+   loadMapAndLyft();
+ }
+
  function matchPeople(currUser, pastUser) {
-   console.log("Trying to match " + currUser.val().name + " and " + pastUser.val().name)
-   if (!currUser.val().matched && !pastUser.val().matched) {
+   console.log("Trying to match " + currUser.val().name + " and " + pastUser.val().name);
+   //if both the users are not matched
+   if (!pastUser.val().matched && !currentUserMatched) {
      console.log("trying to match " + currUser.val().name + " and " + pastUser.val().name + " because both of them are unmatched");
-
-     //db.ref("-Users/-KUanJA9egwmPsJCxXpv/displayName").set("New trainer");
-
+     //to ensure current user is only matched once
+     currentUserMatched = true;
      database.ref(currUser.key + "/matched").set(true);
      database.ref(pastUser.key + "/matched").set(true);
      database.ref(currUser.key + "/matchedWith").set(pastUser.key);
@@ -346,6 +355,12 @@
    return false;
  }
 
+ function showUnMatchedFlow() {
+   hideMatchedResults();
+   hideMainContent();
+   showUnmatchedResults();
+ }
+
  function getMatchingProfessions() {
 
    //retrieve last child added to database
@@ -355,38 +370,52 @@
    });
    console.log("My details " + JSON.stringify(lastChildAdded));
 
+   // to ensure if we do not find a matching user profession in firebase 
+   //           then we show unmatched message
+   showUnMatchedFlow();
+
+   //query FB to get users with profession matching the seeking profession of current user
    database.ref().orderByChild("myProfession").equalTo(lastChildAdded.val().seekingProf).on("child_added", function(snapshot2) {
 
+     // further match the user such that 
+     // other user is seeking for current user's profession
+     // they are close by 
+     // ensure the user is not matched with himself
+     // only matched unmatched users
      if ((snapshot2.val().seekingProf == lastChildAdded.val().myProfession) &&
        isCloseBy(lastChildAdded, snapshot2) &&
        (snapshot2.key != lastChildAdded.key) &&
        (!snapshot2.val().matched)) {
        if (matchPeople(lastChildAdded, snapshot2)) {
-         lastChildAdded.val().matched = true;
+
          console.log("Matched with " + snapshot2.val().name + " and their details are " + JSON.stringify(snapshot2));
+
          matchedPersonName = snapshot2.val().name;
          userLatitude = lastChildAdded.val().userLat;
          userLongitude = lastChildAdded.val().userLong;
-         findMidpointOfUsers(lastChildAdded, snapshot2);
-         getRestAddress(restLat, restLong);
+         setRestaurant(lastChildAdded, snapshot2);
          hideUnmatchedResults();
          hideMainContent();
          loadMatchedResultContent();
          showMatchedResults();
+       } else {
+         showUnMatchedFlow();
        }
      } else {
-       hideMatchedResults();
-       hideMainContent();
-       showUnmatchedResults();
+       // we had a user matching by profession but he did not pass further criteria
+       showUnMatchedFlow();
      }
    });
-   database.ref().endAt().limitToLast(1).on('child_added', function(snapshot) {
-     lastChildAdded = snapshot;
-   });
+ }
+ //get a restaurant at mid point of the two locations of matched people.
+ function setRestaurant(lastChildAdded, snapshot2) {
+   findMidpointOfUsers(lastChildAdded, snapshot2);
+   getRestAddress(restLat, restLong);
  }
 
  function loadMapAndLyft() {
-
+   console.log("in lyft user lat " + userLatitude + " user long " + userLongitude)
+   console.log("in lyft rest lat " + restLat + " rest long " + restLong)
    //For embedded map
    var gmapCanvas = document.querySelector('#gmap_canvas2');
    var origin = userLatitude + "," + userLongitude //'userLatitude,userLongitude'
@@ -449,17 +478,32 @@
      matchedWith: "",
      matchedOn: ""
    });
+   //This is a work around to avoid race condition
    getMatchingProfessions();
  }
 
+ //Add listeners on 2. button in the app
+ //1. get location button
+ //2. go button 
+ function addListeners() {
+   addListnerOnAutoFill();
+   addListenerOnGo();
+ }
+
  function init() {
+   //add listner
+   addListeners();
+
+   //hide post match html elements
    hideMatchedResults();
    hideUnmatchedResults();
+
+   //ensure functions available
    ensureRadianIsAvailable();
    ensureDegreesIsAvailable();
+
+   //populate dropdown values
    createDropdownContent();
-   getAddressByTextInput();
-   autofill();
  }
 
  init();
