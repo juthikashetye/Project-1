@@ -33,6 +33,8 @@
  var userEmail = "";
  var user1Prof = "";
  var user2Prof = "";
+ var user1Act = "";
+ var user2Act = "";
  var userAddress;
 
  //stores last child values
@@ -53,6 +55,9 @@
 
  //so that match happens only once
  var currentUserMatched = false;
+
+ //list of friendship activities 
+ var activities = ['Yoga', 'Board Games', 'Sports', 'Fitness', 'Hiking', 'Fishing', 'Gardening', 'Art', 'Music', 'Food'];
 
  function hideMatchedResults() {
    $("#matchedResults").hide();
@@ -78,6 +83,40 @@
    $("#mainContent").show();
  }
 
+ //muirl type radio buttons
+ function addRadioButtonListener() {
+   $(document).ready(function() {
+     $('input[type="radio"]').click(function() {
+       var demovalue = $(this).val();
+       $("div.myDiv").hide();
+       $("#show" + demovalue).show();
+     });
+     groupMuirl();
+   });
+ }
+ // group muirl angular
+ function groupMuirl() {
+   var app = angular.module("muirlApp", []);
+   app.controller("myCtrl", function($scope) {
+     $scope.products = [];
+     $scope.addItem = function() {
+       $scope.errortext = "";
+       if (!$scope.addMe) {
+         return;
+       }
+       if ($scope.products.indexOf($scope.addMe) == -1) {
+         $scope.products.push($scope.addMe);
+       } else {
+         $scope.errortext = "Email already on list.";
+       }
+     }
+     $scope.removeItem = function(x) {
+       $scope.errortext = "";
+       $scope.products.splice(x, 1);
+     }
+   });
+ }
+
  function createDropdownContent() {
 
    //User dropdowns + professions
@@ -101,8 +140,30 @@
 
    $('#user2').change(function() {
      user2Prof = $("#user2 option:selected").text();
-
      console.log('Prof2:', user2Prof);
+   });
+
+   //activities
+   for (var i = 0; i < activities.length; i++) {
+     // console.log(activities.length);
+     $('<option/>', {
+       value: activities[i],
+       html: activities[i]
+     }).appendTo('#user3 select');
+     $('<option/>', {
+       value: activities[i],
+       html: activities[i]
+     }).appendTo('#user4 select');
+   }
+
+   $('#user3').change(function() {
+     user1Act = $("#user3 option:selected").text();
+     console.log('Act1:', user1Act);
+   });
+
+   $('#user4').change(function() {
+     user2Act = $("#user4 option:selected").text();
+     console.log('Act2:', user2Act);
    });
  }
 
@@ -111,6 +172,9 @@
    userEmail = $("#email").val().trim();
    user1Prof = $("#profession1").val().trim();
    user2Prof = $("#profession2").val().trim();
+   // user1Act = $("#activity1").val().trim();
+   // user2Act = $("#activity2").val().trim();
+
  }
 
  //coverts a long lat to a text address and sets it in the text box
@@ -486,6 +550,7 @@
  //1. get location button
  //2. go button 
  function addListeners() {
+   addRadioButtonListener();
    addListnerOnAutoFill();
    addListenerOnGo();
  }

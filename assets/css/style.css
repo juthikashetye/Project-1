@@ -15,7 +15,7 @@ main {
 .modal .modal-footer,
 .modal-content {
   background-color: rgba(61, 33, 23, 0.9);
-  color: white;
+  color: #ffffff;
 }
 
 .modal h4 {
@@ -23,8 +23,8 @@ main {
 }
 
 .sidenav {
-   background: linear-gradient(to bottom, #26a69a 0%, #66ffff 99%);
-   opacity: 0.9;
+  background: linear-gradient(to bottom, #26a69a 0%, #66ffff 99%);
+  opacity: 0.9;
 }
 
 a:hover {
@@ -64,6 +64,23 @@ nav .brand-logo {
   display: inline-block;
 }
 
+.myDiv {
+  display: none;
+}
+
+#showTwo {
+  display: none
+}
+
+#showThree {
+  display: none
+}
+
+.dropdown-content {
+  max-height: 300px;
+  overflow: scroll;
+}
+
 .dropdown-content li>span {
   color: rgb(200, 65, 39);
   background-color: rgb(255, 250, 240);
@@ -75,6 +92,7 @@ nav .brand-logo {
 
 p {
   color: rgb(61, 33, 23);
+  margin: 3%;
 }
 
 #matchName {

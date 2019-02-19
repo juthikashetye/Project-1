@@ -13,10 +13,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <!-- style.css -->
     <link rel="stylesheet" type="text/css" href="./assets/css/style.css">
-    <!-- Angular JS -->
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
   </head>
-  <body>
+  <body ng-app="muirlApp">
     <!--Navigation-->   
     <nav>
       <div class="z-depth-0 nav-wrapper">
@@ -49,22 +47,71 @@
     <main>
       <div class="container flow-text">
         <div id="mainContent">
-          <div class="row">
-            <div class="dropdown input-field col s12 m6 l6 " id="user1">
-              <select id="profession1">
-                <option value="" disabled selected>Select</option>
-              </select>
-              <label class="selfLabel">I'm a(n)</label>
+          <div class="section" id="muril-type-select">
+            <div class="row center-align">
+              <form action="#"> 
+                <label>
+                <input type="radio" name="demo" value="One" checked>
+                <span>Professional</span>
+                </label>  
+                <label>
+                <input type="radio" name="demo" value="Two">
+                <span>Friendship</span>
+                </label>        
+                <label>
+                <input type="radio" name="demo" value="Three">
+                <span>Group muirl</span>
+                </label>              
+              </form>
             </div>
-            <div class="dropdown input-field col s12 m6 l6" id="user2">
-              <select id="profession2">
-                <option value="" disabled selected>Select</option>
-              </select>
-              <label class="selfLabel">who wants to meetup with a(n)</label>
+          </div>
+          <div id="showOne" class="myDiv">
+            <div class="row">
+              <div class="dropdown input-field col s12 m6 l6 " id="user1">
+                <select id="profession1">
+                  <option value="" disabled selected>Select</option>
+                </select>
+                <label class="selfLabel">I'm a(n)</label>
+              </div>
+              <div class="dropdown input-field col s12 m6 l6" id="user2">
+                <select id="profession2">
+                  <option value="" disabled selected>Select</option>
+                </select>
+                <label class="selfLabel">who wants to meetup with a(n)</label>
+              </div>
+            </div>
+          </div>
+          <div id="showTwo" class="myDiv">
+            <div class="row">
+              <div class="dropdown input-field col s12 m6 l6" id="user3">
+                <select id="activity1">
+                  <option value="" disabled selected>Select</option>
+                </select>
+                <label class="selfLabel">I'm interested in:</label>
+              </div>
+              <div class="dropdown input-field col s12 m6 l6" id="user4">
+                <select id="activity2">
+                  <option value="" disabled selected>Select</option>
+                </select>
+                <label class="selfLabel">and want to meet up with someone interested in:</label>
+              </div>
+            </div>
+          </div>
+          <div id="showThree" class="myDiv">
+            <div class="row">
+              <div class="col s12 m12 l8 offset-l2" ng-controller="myCtrl" >
+                <label class="active" for="userAddress">Add email addresses for a group muirl:</label> 
+                <ul>
+                  <li ng-repeat="x in products">{{x}}<span ng-click="removeItem($index)">×</span></li>
+                </ul>
+                <input class="input-field" ng-model="addMe" placeholder="email@address.com" onfocus="this.value=''">
+                <button class="btn waves-effect waves-light" ng-click="addItem()">Add</button>
+                <p>{{errortext}}</p>
+              </div>
             </div>
           </div>
           <!--Input-->
-          <form ng-app="">
+          <form>
             <div class="row">
               <div class="input-field col s1 m1 l3  offset-l2">
                 <button id="autofill-small" class="btn-floating waves-effect hide-on-large-only" type="submit" name="action"><i class="material-icons ">add_location</i></button> 
@@ -136,6 +183,7 @@
     <script src= "./assets/javascript/app.js"></script>
     <!-- Compiled and minified JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
     <script type="text/javascript">
       $(document).ready(function(){
       $('select').formSelect();
