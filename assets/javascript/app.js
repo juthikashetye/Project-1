@@ -257,7 +257,7 @@
    if (!($("#autofill-small, #autofill-large").hasClass("clicked"))) {
      console.log("searching for location id for " + userAddress);
      //autocomplete text key (used for getting location id of user address)
-     var locIdURL = "http://autocomplete.geocoder.api.here.com/6.2/suggest.json?app_id=" + appId + "&app_code=" + appCode + "&query=" + userAddress + "&beginHighlight=<b>&endHighlight=</b>";
+     var locIdURL = "https://autocomplete.geocoder.api.here.com/6.2/suggest.json?app_id=" + appId + "&app_code=" + appCode + "&query=" + userAddress + "&beginHighlight=<b>&endHighlight=</b>";
      console.log("using api " + locIdURL);
      $.ajax({
        url: locIdURL,
@@ -287,7 +287,7 @@
    console.log("searching for cordinates for " + locationID)
 
    //geocoder key (used for getting lat and long from user's location id)
-   var locIdCoordURL = "http://geocoder.api.here.com/6.2/geocode.json?locationid=" + locationID + "&jsonattributes=1&gen=9&app_id=" + appId + "&app_code=" + appCode;
+   var locIdCoordURL = "https://geocoder.api.here.com/6.2/geocode.json?locationid=" + locationID + "&jsonattributes=1&gen=9&app_id=" + appId + "&app_code=" + appCode;
    console.log("using api " + locIdCoordURL)
    $.ajax({
      url: locIdCoordURL,
@@ -484,7 +484,7 @@
    var gmapCanvas = document.querySelector('#gmap_canvas2');
    var origin = userLatitude + "," + userLongitude //'userLatitude,userLongitude'
    var destination = restLat + "," + restLong //Destination Lat/Lon
-   var gMapApiKey = ''
+   var gMapApiKey = '';
 
    gmapCanvas.src = src = "https://www.google.com/maps/embed/v1/directions?origin=" + userLatitude + "," + userLongitude + "&destination=" + restLat + "," + restLong + "&mode=driving&mode=walking&mode=transit&key=" + gMapApiKey
 

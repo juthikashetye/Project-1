@@ -53,7 +53,7 @@
               <form action="#"> 
                 <label>
                 <input type="radio" name="demo" value="One" checked>
-                <span>Professional</span>
+                <span>Business</span>
                 </label>  
                 <label>
                 <input type="radio" name="demo" value="Two">
@@ -84,18 +84,18 @@
           </div>
           <div id="showTwo" class="myDiv">
             <div class="row">
-              <div class="dropdown input-field col s12 m6 l6" id="user3">
+              <div class="dropdown input-field col s12 l8 offset-l2" id="user3">
                 <select id="activity1">
                   <option value="" disabled selected>Select</option>
                 </select>
-                <label class="selfLabel">I'm interested in:</label>
+                <label class="selfLabel">I want to meet up with someone interested in:</label>
               </div>
-              <div class="dropdown input-field col s12 m6 l6" id="user4">
+              <!-- <div class="dropdown input-field col s12 m6 l6" id="user4">
                 <select id="activity2">
                   <option value="" disabled selected>Select</option>
                 </select>
                 <label class="selfLabel">and want to meet up with someone interested in:</label>
-              </div>
+              </div> -->
             </div>
           </div>
           <div id="showThree" class="myDiv">
@@ -152,8 +152,10 @@
             <p class="flow-text">Hey <span id="myName"></span>, we found you a match!</p>
             <p class="flow-text">You are meeting <span id="matchName"></span> at <span id="selectedLoc"></span></p>
             <!--iframe -->
+            <div class="section">
             <div class="video-container" id="map">
               <iframe class="embed-responsive-item" src="" id="gmap_canvas2"></iframe>
+            </div>
             </div>
             <div class="flow-text" id="lyft-web-button-parent"></div>
             <p class="flow-text">Click the Lyft button to request a ride or see the map for directions to the location we picked for you.</p>
